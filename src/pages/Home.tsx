@@ -5,6 +5,9 @@ import { TrustStrip } from "@/components/home/TrustStrip";
 import { CategoryGrid } from "@/components/home/CategoryGrid";
 import { ResinSelector } from "@/components/home/ResinSelector";
 import { FlowVelocitySection } from "@/components/home/FlowVelocitySection";
+import { USPGrid } from "@/components/home/USPGrid";
+import { WhyProtpure } from "@/components/home/WhyProtpure";
+import { FacilitySnapshot } from "@/components/home/FacilitySnapshot";
 import { CTABand } from "@/components/home/CTABand";
 
 export default function Home() {
@@ -15,8 +18,11 @@ export default function Home() {
         <HeroSection />
         <TrustStrip />
         <CategoryGrid />
-        <ResinSelector />
         <FlowVelocitySection />
+        <ResinSelector />
+        <USPGrid />
+        <WhyProtpure />
+        <FacilitySnapshot />
         <CTABand />
       </main>
       <Footer />

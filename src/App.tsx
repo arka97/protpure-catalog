@@ -8,6 +8,8 @@ import Products from "./pages/Products.tsx";
 import About from "./pages/About.tsx";
 import Technology from "./pages/Technology.tsx";
 import Resources from "./pages/Resources.tsx";
+import Applications from "./pages/Applications.tsx";
+import Procurement from "./pages/Procurement.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { RFQProvider } from "./context/RFQContext";
 import { RFQDrawer } from "./components/rfq/RFQDrawer";
@@ -26,10 +28,11 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/products" element={<Products />} />
+              <Route path="/applications" element={<Applications />} />
               <Route path="/about" element={<About />} />
               <Route path="/technology" element={<Technology />} />
+              <Route path="/procurement" element={<Procurement />} />
               <Route path="/resources" element={<Resources />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
             <RFQDrawer />

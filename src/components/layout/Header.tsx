@@ -8,7 +8,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 const navItems = [
   { to: "/", label: "Home", end: true },
   { to: "/products", label: "Products" },
+  { to: "/applications", label: "Applications" },
   { to: "/technology", label: "Technology" },
+  { to: "/procurement", label: "Procurement" },
   { to: "/about", label: "About" },
   { to: "/resources", label: "Resources" },
 ];
@@ -23,26 +25,27 @@ export function Header() {
         <Link to="/" className="flex items-center gap-3 group">
           <div className="w-9 h-9 bg-navy rounded-lg flex items-center justify-center">
             <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none">
-              <circle cx="12" cy="12" r="8" stroke="hsl(var(--teal-bright))" strokeWidth="1.5" />
-              <circle cx="12" cy="12" r="3" fill="hsl(var(--teal-bright))" />
+              <path d="M12 2L6 6V12C6 15.5 8.7 18.7 12 19.5C15.3 18.7 18 15.5 18 12V6L12 2Z" stroke="hsl(var(--teal-bright))" strokeWidth="1.5" strokeLinejoin="round" />
+              <circle cx="12" cy="12" r="2.5" fill="hsl(var(--teal-bright))" />
+              <circle cx="12" cy="12" r="1" fill="white" />
             </svg>
           </div>
           <div className="leading-none">
             <div className="font-serif text-lg text-navy">ProtPure</div>
-            <div className="text-[9px] tracking-[0.1em] text-slate-light font-medium uppercase mt-0.5">
+            <div className="text-[9px] tracking-[0.1em] text-slate font-semibold uppercase mt-0.5">
               Tech Pvt. Ltd.
             </div>
           </div>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-0.5">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.end}
               className={({ isActive }) =>
-                `px-3.5 py-2 rounded-md text-sm transition-colors ${
+                `px-3 py-2 rounded-md text-[13px] transition-colors ${
                   isActive
                     ? "text-teal font-medium bg-teal-pale"
                     : "text-slate hover:text-navy hover:bg-secondary"
@@ -72,7 +75,7 @@ export function Header() {
 
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="md:hidden">
+              <Button variant="ghost" size="icon" className="lg:hidden">
                 <Menu className="w-5 h-5" />
               </Button>
             </SheetTrigger>
