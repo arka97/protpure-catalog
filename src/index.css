@@ -8,35 +8,49 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Brand */
+    --navy: 215 60% 10%;          /* #0A1628 */
+    --navy-2: 217 56% 14%;        /* #0F1E35 */
+    --navy-3: 217 52% 19%;        /* #162847 */
+    --teal: 171 80% 27%;          /* #0E7C6B */
+    --teal-light: 170 78% 36%;    /* #13A38E */
+    --teal-bright: 171 75% 43%;   /* #1DBDA7 */
+    --teal-pale: 170 38% 93%;     /* #E8F5F3 */
+    --teal-pale-2: 170 38% 87%;   /* #D0EDE9 */
+    --slate: 218 17% 35%;         /* #4A5568 */
+    --slate-light: 215 16% 47%;   /* #64748B */
+    --on-navy: 207 40% 80%;       /* #B8CFE0 */
+    --on-navy-muted: 205 30% 70%; /* #9AB8CC */
+
+    --background: 210 40% 98%;    /* #F8FAFC */
+    --foreground: 220 26% 14%;    /* #1A202C */
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 26% 14%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 220 26% 14%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 171 80% 27%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 220 26% 14%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 218 17% 35%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 170 38% 93%;
+    --accent-foreground: 171 80% 27%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 171 80% 27%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
@@ -100,6 +114,30 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  h1, h2, h3, h4 { @apply font-serif; letter-spacing: -0.01em; }
+}
+
+@layer utilities {
+  .text-on-navy { color: hsl(var(--on-navy)); }
+  .text-on-navy-muted { color: hsl(var(--on-navy-muted)); }
+  .bg-navy { background-color: hsl(var(--navy)); }
+  .bg-navy-2 { background-color: hsl(var(--navy-2)); }
+  .text-navy { color: hsl(var(--navy)); }
+  .text-teal { color: hsl(var(--teal)); }
+  .bg-teal { background-color: hsl(var(--teal)); }
+  .bg-teal-pale { background-color: hsl(var(--teal-pale)); }
+  .border-teal-pale { border-color: hsl(var(--teal-pale-2)); }
+  .hero-glow {
+    background:
+      radial-gradient(ellipse 600px 400px at 85% 0%, hsl(var(--teal) / 0.18), transparent 60%),
+      radial-gradient(ellipse 500px 350px at 10% 100%, hsl(var(--teal-light) / 0.10), transparent 70%),
+      hsl(var(--navy));
+  }
+  .hex-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='64'%3E%3Cpath d='M28 0 L56 16 L56 48 L28 64 L0 48 L0 16Z' fill='none' stroke='rgba(255,255,255,0.04)' stroke-width='1'/%3E%3C/svg%3E");
+    background-size: 56px 64px;
   }
 }
