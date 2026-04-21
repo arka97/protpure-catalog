@@ -2,6 +2,8 @@ import { Product, CHROMATOGRAPHY_LABELS } from "@/data/products";
 import { Button } from "@/components/ui/button";
 import { Plus, Atom, Layers, Droplet, Magnet, FlaskConical } from "lucide-react";
 import { useRFQ } from "@/context/RFQContext";
+import { useCompare } from "@/context/CompareContext";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const iconMap = {
   iec: Atom,
@@ -18,7 +20,9 @@ interface Props {
 
 export function ProductCard({ product, onOpen }: Props) {
   const { addItem } = useRFQ();
+  const { has, toggle, canAdd } = useCompare();
   const Icon = iconMap[product.chromatographyType];
+  const checked = has(product.id);
 
   return (
     <article
@@ -74,17 +78,33 @@ export function ProductCard({ product, onOpen }: Props) {
             {product.status === "available" ? "Available" : product.status}
           </span>
         </div>
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={(e) => {
-            e.stopPropagation();
-            addItem(product, product.packSizes[0]);
-          }}
-          className="text-teal hover:text-teal-light hover:bg-teal-pale gap-1 h-8 px-2.5"
-        >
-          <Plus className="w-3.5 h-3.5" /> RFQ
-        </Button>
+        <div className="flex items-center gap-1">
+          <label
+            onClick={(e) => e.stopPropagation()}
+            className={`flex items-center gap-1.5 text-[11px] cursor-pointer px-2 py-1 rounded ${
+              checked ? "text-teal" : "text-slate-light hover:text-slate"
+            } ${!checked && !canAdd ? "opacity-40 cursor-not-allowed" : ""}`}
+          >
+            <Checkbox
+              checked={checked}
+              disabled={!checked && !canAdd}
+              onCheckedChange={() => toggle(product.id)}
+              className="h-3.5 w-3.5"
+            />
+            Compare
+          </label>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={(e) => {
+              e.stopPropagation();
+              addItem(product, product.packSizes[0]);
+            }}
+            className="text-teal hover:text-teal-light hover:bg-teal-pale gap-1 h-8 px-2.5"
+          >
+            <Plus className="w-3.5 h-3.5" /> RFQ
+          </Button>
+        </div>
       </div>
     </article>
   );

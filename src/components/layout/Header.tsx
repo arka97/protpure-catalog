@@ -8,6 +8,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 const navItems = [
   { to: "/", label: "Home", end: true },
   { to: "/products", label: "Products" },
+  { to: "/technology", label: "Technology" },
+  { to: "/about", label: "About" },
+  { to: "/resources", label: "Resources" },
 ];
 
 export function Header() {

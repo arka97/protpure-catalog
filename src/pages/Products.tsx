@@ -9,6 +9,8 @@ import { products, Product } from "@/data/products";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
+import { CompareBar } from "@/components/products/CompareBar";
+import { CompareModal } from "@/components/products/CompareModal";
 
 export default function Products() {
   const [params, setParams] = useSearchParams();
@@ -106,6 +108,8 @@ export default function Products() {
       </main>
       <Footer />
       <ProductDetailModal product={selected} onClose={() => setSelected(null)} />
+      <CompareBar />
+      <CompareModal />
     </div>
   );
 }
