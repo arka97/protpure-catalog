@@ -19,7 +19,7 @@ export function HeroSection() {
           <div className="inline-flex items-center gap-2 bg-teal/15 border border-teal/30 rounded-full px-3 py-1 mb-7">
             <span className="w-1.5 h-1.5 rounded-full bg-teal-bright animate-pulse" />
             <span className="text-xs text-teal-bright font-medium tracking-wide">
-              Manufactured in Anand, Gujarat
+              Manufactured in India
             </span>
           </div>
           <h1 className="font-serif text-4xl md:text-[52px] leading-[1.07] text-white tracking-tight mb-6">
@@ -28,7 +28,7 @@ export function HeroSection() {
           </h1>
           <p className="text-base text-on-navy leading-relaxed mb-9 max-w-xl">
             High-performance chromatography resins — ion exchange, affinity, SEC, HIC —
-            manufactured in Anand, Gujarat. 600 L/month capacity, 2–3 week delivery,
+            manufactured in Gujarat, India. 600 L/month capacity, 2–3 week delivery,
             used in GMP facilities.
           </p>
           <div className="flex flex-wrap gap-3 mb-8">
