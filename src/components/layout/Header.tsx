@@ -1,18 +1,26 @@
 import { NavLink, Link } from "react-router-dom";
-import { ShoppingCart, Menu } from "lucide-react";
+import { ShoppingCart, Menu, ChevronDown } from "lucide-react";
 import { useRFQ } from "@/context/RFQContext";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const navItems = [
   { to: "/", label: "Home", end: true },
   { to: "/products", label: "Products" },
+  { to: "/about", label: "About" },
+];
+
+const resourceItems = [
   { to: "/applications", label: "Applications" },
   { to: "/technology", label: "Technology" },
-  { to: "/procurement", label: "Procurement" },
-  { to: "/about", label: "About" },
-  { to: "/resources", label: "Resources" },
+  { to: "/resources", label: "Downloads" },
 ];
 
 export function Header() {
@@ -55,6 +63,32 @@ export function Header() {
               {item.label}
             </NavLink>
           ))}
+
+          <DropdownMenu>
+            <DropdownMenuTrigger className="px-3 py-2 rounded-md text-[13px] text-slate hover:text-navy hover:bg-secondary inline-flex items-center gap-1 outline-none focus-visible:ring-2 focus-visible:ring-teal">
+              Resources <ChevronDown className="w-3 h-3" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="min-w-[180px]">
+              {resourceItems.map((r) => (
+                <DropdownMenuItem key={r.to} asChild>
+                  <Link to={r.to} className="cursor-pointer">{r.label}</Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <NavLink
+            to="/contact"
+            className={({ isActive }) =>
+              `px-3 py-2 rounded-md text-[13px] transition-colors ${
+                isActive
+                  ? "text-teal font-medium bg-teal-pale"
+                  : "text-slate hover:text-navy hover:bg-secondary"
+              }`
+            }
+          >
+            Contact
+          </NavLink>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -96,6 +130,34 @@ export function Header() {
                     {item.label}
                   </NavLink>
                 ))}
+                <div className="px-4 pt-3 pb-1 text-[11px] font-semibold tracking-[0.1em] uppercase text-slate-light">
+                  Resources
+                </div>
+                {resourceItems.map((r) => (
+                  <NavLink
+                    key={r.to}
+                    to={r.to}
+                    onClick={() => setMobileOpen(false)}
+                    className={({ isActive }) =>
+                      `px-6 py-2.5 rounded-md text-sm ${
+                        isActive ? "text-teal font-medium bg-teal-pale" : "text-slate"
+                      }`
+                    }
+                  >
+                    {r.label}
+                  </NavLink>
+                ))}
+                <NavLink
+                  to="/contact"
+                  onClick={() => setMobileOpen(false)}
+                  className={({ isActive }) =>
+                    `px-4 py-3 rounded-md text-sm mt-1 ${
+                      isActive ? "text-teal font-medium bg-teal-pale" : "text-slate"
+                    }`
+                  }
+                >
+                  Contact
+                </NavLink>
               </nav>
             </SheetContent>
           </Sheet>

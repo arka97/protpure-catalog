@@ -9,11 +9,13 @@ import About from "./pages/About.tsx";
 import Technology from "./pages/Technology.tsx";
 import Resources from "./pages/Resources.tsx";
 import Applications from "./pages/Applications.tsx";
-import Procurement from "./pages/Procurement.tsx";
+import Contact from "./pages/Contact.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { RFQProvider } from "./context/RFQContext";
 import { RFQDrawer } from "./components/rfq/RFQDrawer";
 import { CompareProvider } from "./context/CompareContext";
+import { WhatsAppFAB } from "./components/layout/WhatsAppFAB";
+import { Navigate } from "react-router-dom";
 
 const queryClient = new QueryClient();
 
@@ -31,11 +33,13 @@ const App = () => (
               <Route path="/applications" element={<Applications />} />
               <Route path="/about" element={<About />} />
               <Route path="/technology" element={<Technology />} />
-              <Route path="/procurement" element={<Procurement />} />
+              <Route path="/procurement" element={<Navigate to="/about" replace />} />
+              <Route path="/contact" element={<Contact />} />
               <Route path="/resources" element={<Resources />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <RFQDrawer />
+            <WhatsAppFAB />
           </CompareProvider>
         </RFQProvider>
       </BrowserRouter>

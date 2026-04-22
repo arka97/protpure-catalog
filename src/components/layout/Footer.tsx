@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Linkedin, MessageCircle } from "lucide-react";
 
 export function Footer() {
   return (
@@ -50,6 +50,7 @@ export function Footer() {
               <li><Link to="/about" className="text-on-navy hover:text-white transition-colors">About</Link></li>
               <li><Link to="/technology" className="text-on-navy hover:text-white transition-colors">Technology</Link></li>
               <li><Link to="/resources" className="text-on-navy hover:text-white transition-colors">Resources</Link></li>
+              <li><Link to="/contact" className="text-on-navy hover:text-white transition-colors">Contact</Link></li>
             </ul>
           </div>
 
@@ -60,14 +61,15 @@ export function Footer() {
             <ul className="space-y-3 text-sm text-on-navy">
               <li className="flex items-start gap-2">
                 <Mail className="w-4 h-4 mt-0.5 text-teal-bright flex-shrink-0" />
-                <div className="space-y-0.5">
-                  <div>protpure@gmail.com</div>
-                  <div>info@protpure.com</div>
-                </div>
+                <a href="mailto:info@protpure.com" className="hover:text-white transition-colors">
+                  info@protpure.com
+                </a>
               </li>
               <li className="flex items-start gap-2">
                 <Phone className="w-4 h-4 mt-0.5 text-teal-bright flex-shrink-0" />
-                <div>+91 94265 96644</div>
+                <a href="tel:+919426596644" className="hover:text-white transition-colors">
+                  +91 94265 96644
+                </a>
               </li>
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 mt-0.5 text-teal-bright flex-shrink-0" />
@@ -78,6 +80,36 @@ export function Footer() {
                 </div>
               </li>
             </ul>
+
+            <div className="flex items-center gap-2 mt-5">
+              {[
+                { href: "mailto:info@protpure.com", label: "Email", icon: Mail },
+                { href: "tel:+919426596644", label: "Phone", icon: Phone },
+                {
+                  href: "https://wa.me/919426596644",
+                  label: "WhatsApp",
+                  icon: MessageCircle,
+                  external: true,
+                },
+                {
+                  href: "https://www.linkedin.com/company/protpure",
+                  label: "LinkedIn",
+                  icon: Linkedin,
+                  external: true,
+                },
+              ].map((s) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target={s.external ? "_blank" : undefined}
+                  rel={s.external ? "noopener noreferrer" : undefined}
+                  aria-label={s.label}
+                  className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-on-navy hover:text-teal-bright hover:border-teal-bright/40 transition-colors"
+                >
+                  <s.icon className="w-4 h-4" />
+                </a>
+              ))}
+            </div>
           </div>
         </div>
 

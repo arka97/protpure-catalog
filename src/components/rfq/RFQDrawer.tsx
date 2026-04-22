@@ -4,6 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { X, Minus, Plus, MessageSquare, ShoppingCart, CheckCircle2 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -20,7 +27,8 @@ const formSchema = z.object({
 });
 
 export function RFQDrawer() {
-  const { isOpen, setOpen, items, removeItem, updateQuantity, updateNotes, clearCart } = useRFQ();
+  const { isOpen, setOpen, items, removeItem, updateQuantity, updateNotes, updatePack, clearCart } =
+    useRFQ();
   const [submitted, setSubmitted] = useState(false);
   const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
   const [form, setForm] = useState({
@@ -84,7 +92,8 @@ export function RFQDrawer() {
             </div>
             <h3 className="font-serif text-xl text-navy">Thank you</h3>
             <p className="text-sm text-slate leading-relaxed">
-              We'll respond within 24–48 hours with availability and pricing for your inquiry.
+              We'll respond from <span className="font-mono text-navy">info@protpure.com</span> within
+              24–48 hours with availability and pricing for your inquiry.
             </p>
             <Button onClick={() => handleClose(false)} variant="outline" className="mt-3">
               Close
@@ -110,9 +119,6 @@ export function RFQDrawer() {
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="min-w-0">
                       <div className="text-sm font-semibold text-navy">{item.product.name}</div>
-                      <div className="text-[11px] text-slate-light font-mono mt-0.5">
-                        {item.pack.catNo} · {item.pack.size}
-                      </div>
                     </div>
                     <button
                       type="button"
@@ -122,6 +128,30 @@ export function RFQDrawer() {
                     >
                       <X className="w-4 h-4" />
                     </button>
+                  </div>
+                  <div className="mb-3">
+                    <Label className="text-[11px] text-slate-light font-semibold tracking-wider uppercase mb-1 block">
+                      Pack size
+                    </Label>
+                    <Select
+                      value={item.pack.catNo}
+                      onValueChange={(catNo) => {
+                        const pack = item.product.packSizes.find((p) => p.catNo === catNo);
+                        if (pack) updatePack(item.id, pack);
+                      }}
+                    >
+                      <SelectTrigger className="h-9 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {item.product.packSizes.map((p) => (
+                          <SelectItem key={p.catNo} value={p.catNo} className="text-sm">
+                            <span className="font-medium">{p.size}</span>
+                            <span className="text-slate-light font-mono ml-2">· {p.catNo}</span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center border border-border rounded-md">
