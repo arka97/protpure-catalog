@@ -92,7 +92,7 @@ export function Footer() {
                   external: true,
                 },
                 {
-                  href: "https://www.linkedin.com/company/protpure",
+                  href: "https://www.linkedin.com/company/protpure-tech-pvt-ltd/",
                   label: "LinkedIn",
                   icon: Linkedin,
                   external: true,
