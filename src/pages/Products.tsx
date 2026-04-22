@@ -6,11 +6,13 @@ import { FilterSidebar } from "@/components/products/FilterSidebar";
 import { ProductCard } from "@/components/products/ProductCard";
 import { ProductDetailModal } from "@/components/products/ProductDetailModal";
 import { products, Product } from "@/data/products";
+import { FlowVariant } from "@/data/products";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal } from "lucide-react";
 import { CompareBar } from "@/components/products/CompareBar";
 import { CompareModal } from "@/components/products/CompareModal";
+import { FindYourResinPanel } from "@/components/products/FindYourResinPanel";
 
 export default function Products() {
   const [params, setParams] = useSearchParams();
@@ -19,6 +21,7 @@ export default function Products() {
   const type = params.get("type");
   const exchanger = params.get("exchanger");
   const status = params.get("status");
+  const flow = params.get("flow");
   const ids = params.get("ids");
 
   const filtered = useMemo(() => {
@@ -26,10 +29,11 @@ export default function Products() {
       if (type && p.chromatographyType !== type) return false;
       if (exchanger && p.exchangerType !== exchanger) return false;
       if (status && p.status !== status) return false;
+      if (flow && p.flowVariant !== flow) return false;
       if (ids && !ids.split(",").includes(p.id)) return false;
       return true;
     });
-  }, [type, exchanger, status, ids]);
+  }, [type, exchanger, status, flow, ids]);
 
   const updateParam = (key: string, value: string | null) => {
     const next = new URLSearchParams(params);
@@ -47,6 +51,7 @@ export default function Products() {
       type={type}
       exchanger={exchanger}
       status={status}
+      flow={flow}
       onChange={updateParam}
       onClear={clearAll}
     />
@@ -88,6 +93,10 @@ export default function Products() {
             <div className="hidden md:block sticky top-24 self-start">{sidebar}</div>
 
             <div>
+              <FindYourResinPanel
+                flow={(flow as FlowVariant | null) ?? null}
+                onFlowChange={(v) => updateParam("flow", v)}
+              />
               {filtered.length === 0 ? (
                 <div className="bg-white border border-dashed border-border rounded-xl p-12 text-center">
                   <p className="text-slate mb-3">No products match these filters.</p>

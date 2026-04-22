@@ -1,4 +1,10 @@
-import { Product, ChromatographyType, CHROMATOGRAPHY_LABELS, EXCHANGER_LABELS } from "@/data/products";
+import {
+  Product,
+  ChromatographyType,
+  CHROMATOGRAPHY_LABELS,
+  EXCHANGER_LABELS,
+  FlowVariant,
+} from "@/data/products";
 
 const typeColors: Record<ChromatographyType, string> = {
   iec: "hsl(var(--teal))",
@@ -13,11 +19,19 @@ interface Props {
   type: string | null;
   exchanger: string | null;
   status: string | null;
-  onChange: (key: "type" | "exchanger" | "status", value: string | null) => void;
+  flow: string | null;
+  onChange: (key: "type" | "exchanger" | "status" | "flow", value: string | null) => void;
   onClear: () => void;
 }
 
-export function FilterSidebar({ products, type, exchanger, status, onChange, onClear }: Props) {
+const FLOW_LABELS: Record<FlowVariant, string> = {
+  hr: "HR · 40 µm",
+  precise: "Precise · 60 µm",
+  standard: "Standard · 90 µm",
+  faster: "Faster · 150 µm",
+};
+
+export function FilterSidebar({ products, type, exchanger, status, flow, onChange, onClear }: Props) {
   const typeCounts = (Object.keys(CHROMATOGRAPHY_LABELS) as ChromatographyType[]).map((t) => ({
     value: t,
     label: CHROMATOGRAPHY_LABELS[t],
@@ -32,7 +46,7 @@ export function FilterSidebar({ products, type, exchanger, status, onChange, onC
     })
   );
 
-  const activeCount = [type, exchanger, status].filter(Boolean).length;
+  const activeCount = [type, exchanger, status, flow].filter(Boolean).length;
 
   const Item = ({
     active,
@@ -132,6 +146,23 @@ export function FilterSidebar({ products, type, exchanger, status, onChange, onC
             label="Pipeline"
             count={products.filter((p) => p.status === "pipeline").length}
           />
+        </div>
+      </div>
+
+      <div>
+        <h4 className="text-[11px] font-semibold tracking-[0.1em] uppercase text-slate mb-3 font-sans">
+          Flow profile
+        </h4>
+        <div className="space-y-0.5">
+          {(Object.keys(FLOW_LABELS) as FlowVariant[]).map((f) => (
+            <Item
+              key={f}
+              active={flow === f}
+              onClick={() => onChange("flow", flow === f ? null : f)}
+              label={FLOW_LABELS[f]}
+              count={products.filter((p) => p.flowVariant === f).length}
+            />
+          ))}
         </div>
       </div>
     </aside>
