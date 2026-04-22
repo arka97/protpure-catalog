@@ -14,6 +14,7 @@ type Action =
   | { type: "REMOVE_ITEM"; id: string }
   | { type: "UPDATE_QUANTITY"; id: string; quantity: number }
   | { type: "UPDATE_NOTES"; id: string; notes: string }
+  | { type: "UPDATE_PACK"; id: string; pack: PackSize }
   | { type: "CLEAR_CART" };
 
 function reducer(state: RFQItem[], action: Action): RFQItem[] {
@@ -39,6 +40,24 @@ function reducer(state: RFQItem[], action: Action): RFQItem[] {
       );
     case "UPDATE_NOTES":
       return state.map((i) => (i.id === action.id ? { ...i, notes: action.notes } : i));
+    case "UPDATE_PACK": {
+      const item = state.find((i) => i.id === action.id);
+      if (!item) return state;
+      const newId = `${item.product.id}__${action.pack.catNo}`;
+      if (newId === action.id) return state;
+      const existing = state.find((i) => i.id === newId);
+      if (existing) {
+        // Merge quantities, drop the old line
+        return state
+          .filter((i) => i.id !== action.id)
+          .map((i) =>
+            i.id === newId ? { ...i, quantity: i.quantity + item.quantity } : i
+          );
+      }
+      return state.map((i) =>
+        i.id === action.id ? { ...i, id: newId, pack: action.pack } : i
+      );
+    }
     case "CLEAR_CART":
       return [];
   }
@@ -53,6 +72,7 @@ interface Ctx {
   removeItem: (id: string) => void;
   updateQuantity: (id: string, q: number) => void;
   updateNotes: (id: string, n: string) => void;
+  updatePack: (id: string, pack: PackSize) => void;
   clearCart: () => void;
 }
 
@@ -73,6 +93,7 @@ export function RFQProvider({ children }: { children: ReactNode }) {
     removeItem: (id) => dispatch({ type: "REMOVE_ITEM", id }),
     updateQuantity: (id, quantity) => dispatch({ type: "UPDATE_QUANTITY", id, quantity }),
     updateNotes: (id, notes) => dispatch({ type: "UPDATE_NOTES", id, notes }),
+    updatePack: (id, pack) => dispatch({ type: "UPDATE_PACK", id, pack }),
     clearCart: () => dispatch({ type: "CLEAR_CART" }),
   };
   return <RFQCtx.Provider value={value}>{children}</RFQCtx.Provider>;
