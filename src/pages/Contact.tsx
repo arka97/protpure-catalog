@@ -19,7 +19,7 @@ const schema = z.object({
 
 const ADDRESS = "Plot A2/440/2, Road B-18, GIDC, Vitthal Udyog Nagar, Anand 388121, Gujarat, India";
 const MAPS_EMBED = `https://www.google.com/maps?q=${encodeURIComponent(ADDRESS)}&output=embed`;
-const LINKEDIN_URL = "https://www.linkedin.com/company/protpure";
+const LINKEDIN_URL = "https://www.linkedin.com/company/protpure-tech-pvt-ltd/";
 
 const contactCards = [
   {
@@ -47,7 +47,7 @@ const contactCards = [
   {
     icon: Linkedin,
     label: "LinkedIn",
-    value: "@protpure",
+    value: "@protpure-tech-pvt-ltd",
     href: LINKEDIN_URL,
     hint: "Follow product launches and updates",
     external: true,
