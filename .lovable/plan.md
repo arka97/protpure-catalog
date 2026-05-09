@@ -1,72 +1,90 @@
+# ProtPure Documentation Hub — v1 Canonical Set
 
+Replace the current 5 placeholder docs with **14 fully-drafted canonical docs** grounded in the actual ProtPure codebase (products in `src/data/products.ts`, pages, RFQ/Compare flows, design system, /documents auth via Edge Function).
 
-## Phase 3: Navigation, Contact, RFQ & Engagement Polish
+## Scope
 
-### 1. Header — restructured nav with dropdown
-Update `src/components/layout/Header.tsx`:
-- Top-level nav: **Home · Products · About · Resources ▾ · Contact**
-- "Resources ▾" becomes a dropdown (shadcn `NavigationMenu` or `DropdownMenu`) containing: **Applications**, **Technology**, **Resources** (downloads).
-- Mobile sheet: render the same items as a flat group with subitems indented under "Resources".
-- Remove standalone Procurement / Applications / Technology links.
+- **Delete** the 5 starter `.md` files (`01-vision` … `05-internal-financials`).
+- **Create** 14 new `.md` files under `src/content/docs/` with real, shippable prose, tables, and mermaid diagrams.
+- **Rewrite** `src/content/docs/_meta.ts` so the registry, slug map, and `getDoc()` reflect the new set.
+- **No changes** to routing, PasswordGate, MarkdownRenderer, DocumentsHub, or DocPage — they already handle any number of docs and the `internal` flag drives section grouping.
 
-### 2. Routes
-Update `src/App.tsx`:
-- Add `/contact` → new `Contact` page.
-- Keep `/applications`, `/technology`, `/resources` routes (just regrouped in nav).
-- Remove `/procurement` route (content merges into About). Redirect `/procurement` → `/about`.
+## Document set
 
-### 3. About page — absorb Procurement
-Update `src/pages/About.tsx`:
-- Add **founder name "Dr. Rucha Desai"** to the founder card (replace "Founder & CEO" placeholder header content; keep scientist-led tone).
-- Append a new "Procurement & vendor qualification" section reusing the capabilities grid + vendor docs checklist + capacity statement from `Procurement.tsx`.
-- Delete `src/pages/Procurement.tsx`.
+### Public Spec (6)
 
-### 4. Contact page (new)
-Create `src/pages/Contact.tsx`:
-- PageHero: "Talk to our scientists".
-- Two-column layout:
-  - **Left:** contact methods as large clickable cards — Email (`info@protpure.com`, `mailto:`), Phone (`tel:+919426596644`), WhatsApp (`https://wa.me/919426596644`), LinkedIn (company URL placeholder), Address with embedded Google Maps iframe.
-  - **Right:** short contact form (Name, Company, Email, Message) → on submit, toast success ("We'll respond within 24–48 hours at info@protpure.com").
-- Below: **LinkedIn feed embed**. Note: LinkedIn doesn't offer a true free embed widget; we'll render a styled "LinkedIn" card section with a link-out and a 3rd-party embed iframe slot (LinkedIn company page via `https://www.linkedin.com/embed/feed/...`) with graceful fallback (recent updates as static cards + "Follow on LinkedIn" CTA). Will use `<iframe>` pointing to LinkedIn company page; if blocked, fallback card stays visible.
+| # | Slug | Title | Read | Diagrams |
+|---|---|---|---|---|
+| 01 | `vision-and-pitch` | Vision & Pitch | 4 min | 1 |
+| 02 | `business-and-scope` | Business & Scope | 5 min | 1 |
+| 03 | `product-and-ux` | Product & UX | 6 min | 1 |
+| 04 | `functional-spec` | Functional Spec | 7 min | 1 |
+| 05 | `architecture-and-tech` | Architecture & Tech | 6 min | 2 |
+| 06 | `build-and-operations` | Build & Operations | 5 min | 1 |
 
-### 5. Footer — clickable contact + socials
-Update `src/components/layout/Footer.tsx`:
-- Remove `protpure@gmail.com`. Keep `info@protpure.com` only, as `mailto:` link.
-- Phone → `tel:` link.
-- Add **social icon row** under contact: Email, Phone, WhatsApp, LinkedIn — all clickable with hover teal-bright.
-- Add a "Contact" link in Company column.
+### Internal Reference (8, `internal: true`)
 
-### 6. WhatsApp floating button
-Create `src/components/layout/WhatsAppFAB.tsx`:
-- Fixed bottom-right (bottom-6 right-6), z-50, green circle (#25D366) with WhatsApp icon (lucide `MessageCircle` or inline SVG of WA logo for authenticity), subtle pulse ring.
-- Links to `https://wa.me/919426596644?text=Hi%20ProtPure%2C%20I%27d%20like%20to%20enquire%20about...`.
-- Mounted in `App.tsx` so it persists across all routes.
+| # | Slug | Title | Read | Diagrams |
+|---|---|---|---|---|
+| 07 | `database-reference` | Database Reference | 4 min | 1 |
+| 08 | `edge-functions-reference` | Edge Functions Reference | 4 min | 1 |
+| 09 | `frontend-architecture` | Frontend Architecture | 6 min | 1 |
+| 10 | `component-and-design` | Components & Design System | 5 min | 0 |
+| 11 | `decisions-log` | Decisions Log | 4 min | 0 |
+| 12 | `money-and-membership` | Money & Membership | 4 min | 0 |
+| 13 | `operations-runbook` | Operations Runbook | 5 min | 1 |
+| 14 | `roadmap-and-glossary` | Roadmap & Glossary | 4 min | 0 |
 
-### 7. RFQ Drawer — pack size selectable per line
-Update `src/components/rfq/RFQDrawer.tsx` and `src/context/RFQContext.tsx`:
-- Add reducer action `UPDATE_PACK` that swaps the `pack` on an item (and re-keys the item id to `${productId}__${newCatNo}`, merging if duplicate already exists).
-- In drawer line item, replace the static "catNo · size" line with a shadcn `Select` listing all `product.packSizes` (label: `${size} · ${catNo}`).
-- Update form recipient copy to reference `info@protpure.com`.
+## Per-doc outlines
 
-### 8. Products page — add Resin Selector + Bead Size Selector
-Update `src/pages/Products.tsx`:
-- Above the product grid (right column), add a **collapsible "Find your resin" panel** with two tabs:
-  - **Tab 1 — Resin Selector wizard:** reuse `ResinSelector` from home (already exists). On recommendation, auto-apply filter via URL `ids=...`.
-  - **Tab 2 — Bead Size Selector:** extracted shared component from Technology's bead picker. Selecting a variant filters products by `flowVariant` (existing field on `Product`). Add `flowVariant` to the filter URL params and to `FilterSidebar`'s filter logic.
-- Refactor: extract `BeadSizeSelector.tsx` into `src/components/products/` so both Technology page and Products page consume the same component.
+**01 Vision & Pitch** — Problem (95%+ resin import dependence), mission, 60-sec pitch, target customer archetypes, why-now, 3-year north star, founder note. Mermaid: market positioning quadrant.
 
-### 9. Filter logic
-Update `src/components/products/FilterSidebar.tsx` and `Products.tsx` to support a `flow` param mapping to `flowVariant` (`faster | standard | precise | hr`).
+**02 Business & Scope** — Revenue streams (catalog, custom ligand, method dev), TAM/SAM/SOM framing, segments (mAb, vaccines, academic, CDMO), pricing tiers, in-scope vs out-of-scope for v1, GTM motion. Mermaid: customer journey.
 
-### Technical notes
-- All `mailto:` / `tel:` / `wa.me` links use `target` defaults appropriate (mailto/tel no target, wa.me `target="_blank" rel="noopener"`).
-- LinkedIn placeholder URL: `https://www.linkedin.com/company/protpure` (user can correct later).
-- Google Maps embed URL built from address query string — no API key needed for the basic `https://www.google.com/maps?q=...&output=embed` iframe.
-- WhatsApp number formatting: international `919426596644`.
-- Form success copy across site standardized to mention `info@protpure.com`.
+**03 Product & UX** — Site IA (Home, Products, Applications, Technology, About, Resources, Contact), key user journeys (Browse → Compare → RFQ; Find-Your-Resin → PDP → RFQ), interaction patterns (RFQ drawer, Compare bar, modals), accessibility commitments, mobile behavior. Mermaid: page map.
 
-### Files
-**Create:** `src/pages/Contact.tsx`, `src/components/layout/WhatsAppFAB.tsx`, `src/components/products/BeadSizeSelector.tsx`, `src/components/products/FindYourResinPanel.tsx`
-**Edit:** `src/App.tsx`, `src/components/layout/Header.tsx`, `src/components/layout/Footer.tsx`, `src/pages/About.tsx`, `src/pages/Products.tsx`, `src/pages/Technology.tsx` (use shared bead selector), `src/components/products/FilterSidebar.tsx`, `src/components/rfq/RFQDrawer.tsx`, `src/context/RFQContext.tsx`
-**Delete:** `src/pages/Procurement.tsx`
+**04 Functional Spec** — Feature inventory: Product catalog (filters by chromatography type, exchanger, flow variant, status), ProductCard/PDP, FilterSidebar, BeadSizeSelector, FindYourResinPanel, CompareBar/CompareModal (max N items), RFQDrawer (line items, contact capture), WhatsApp FAB, Documents hub with password gate. Acceptance criteria per feature. Mermaid: RFQ state machine.
 
+**05 Architecture & Tech** — Stack (React 18 + Vite 5 + TS 5 + Tailwind v3 + shadcn + react-router + TanStack Query), Lovable Cloud (Supabase) backend, Edge Function for password verification, content pipeline (`?raw` markdown imports), routing tree, state contexts (RFQ, Compare, DocAuth). Mermaid: system context diagram + request flow for password verify.
+
+**06 Build & Operations** — Local dev, env vars (`VITE_SUPABASE_*`), build/deploy via Lovable, custom domains (protpure.com), SEO setup (sitemap, robots, meta), performance budget, monitoring touchpoints, release checklist.
+
+**07 Database Reference** — Current state: no app tables yet (catalog is static in `src/data/products.ts`); auth used only by docs gate. Planned tables when RFQ persistence lands (rfq_submissions, rfq_line_items, contacts) with column sketches and RLS posture. Mermaid: planned ERD.
+
+**08 Edge Functions Reference** — `verify-doc-password`: contract (POST { password } → { ok }), CORS posture, secret (`DOCS_PASSWORD`), failure modes, rate-limit recommendation, future functions (RFQ submit, lead notification). Mermaid: invoke flow.
+
+**09 Frontend Architecture** — Folder layout, routing (App.tsx), provider stack ordering, component categories (layout/, home/, products/, rfq/, docs/, ui/), data flow patterns, lazy-loading strategy (mermaid dynamic import as exemplar), error boundaries gap. Mermaid: provider tree.
+
+**10 Components & Design System** — Tailwind tokens in `index.css`/`tailwind.config.ts`, semantic color usage rule, typography (serif headings + sans body), shadcn variants, component inventory grouped by domain, naming conventions, dos/don'ts (no raw colors in components).
+
+**11 Decisions Log** — ADR-style entries: (1) Lovable Cloud over self-hosted Supabase, (2) Static product catalog v1 vs DB-backed, (3) Password gate via Edge Function vs client hash, (4) Markdown docs via `?raw` vs CMS, (5) Mermaid lazy-loaded, (6) RFQ as drawer vs page. Each with context/decision/consequences.
+
+**12 Money & Membership** — Pricing model (volume tiers, custom-quote default), RFQ-to-quote workflow, no public e-commerce in v1, future membership/portal sketch (account, order history, MoQ tracking), payment provider positioning (deferred).
+
+**13 Operations Runbook** — Common tasks: rotate `DOCS_PASSWORD`, add a product, add a doc, update sitemap, redeploy Edge Function, troubleshoot CORS, restore from a regression. On-call expectations (solo founder reality), incident severity ladder. Mermaid: incident triage flow.
+
+**14 Roadmap & Glossary** — H1 2026 / H2 2026 milestones, near/mid/far horizon, deferred items, glossary (DBC, IEC, SEC, mAb, CIP, Q/SP/DEAE/CM, agarose, ligand, RFQ, MoQ, CDMO, GMP).
+
+## Implementation steps
+
+1. Delete `src/content/docs/01-vision.md` … `05-internal-financials.md`.
+2. Create the 14 new `.md` files using the per-doc outlines above as full prose drafts (each 400–900 words, with at least one table and the diagrams indicated).
+3. Rewrite `src/content/docs/_meta.ts`:
+   - Import the 14 new files via `?raw`.
+   - Update `DOCS` array (number, slug, title, summary, readTime, diagramCount, internal flag for 07–14).
+   - Update `SOURCES` map.
+   - `getDoc()` is unchanged.
+4. Sanity check: visit `/documents`, confirm 6 public + 8 internal cards render, open one of each, confirm TOC and mermaid render.
+
+## Out of scope
+
+- No routing or auth changes.
+- No new components or styles.
+- No backend tables (called out as "planned" in doc 07).
+- Hub/viewer UI untouched — read-time and diagram counts come from registry metadata only.
+
+## Risks
+
+- **Numbers in internal docs.** Drafts will use clearly-labeled illustrative placeholders for any financial or roadmap figures; you'll want to overwrite before sharing externally.
+- **Mermaid complexity.** Diagrams kept small to avoid render failures and bundle pressure (already lazy-loaded).
+- **Slug change breaks old links.** Existing slugs (`vision`, `business`, etc.) disappear; if anything off-site links to them, those 404 to the hub via the existing `<Navigate>` fallback in `DocPage`.
