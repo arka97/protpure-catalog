@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      docs: {
+        Row: {
+          body: string
+          created_at: string
+          diagram_count: number
+          internal: boolean
+          number: string
+          read_time: string
+          slug: string
+          sort_order: number
+          summary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          diagram_count?: number
+          internal?: boolean
+          number: string
+          read_time: string
+          slug: string
+          sort_order?: number
+          summary: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          diagram_count?: number
+          internal?: boolean
+          number?: string
+          read_time?: string
+          slug?: string
+          sort_order?: number
+          summary?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       products: {
         Row: {
           applications: string[]

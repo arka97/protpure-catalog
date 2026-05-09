@@ -22,8 +22,8 @@ export function PasswordGate({ children }: { children: ReactNode }) {
         body: { password },
       });
       if (fnErr) throw fnErr;
-      if (data?.ok) {
-        unlock();
+      if (data?.ok && data.token && data.expiresAt) {
+        unlock(data.token as string, data.expiresAt as number);
       } else {
         setError("Incorrect password.");
       }

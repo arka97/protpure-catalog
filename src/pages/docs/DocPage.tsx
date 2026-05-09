@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from "react";
 import { Link, useParams, Navigate } from "react-router-dom";
-import { ArrowLeft, Download, Printer } from "lucide-react";
+import { ArrowLeft, Download, Printer, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getDoc } from "@/content/docs/_meta";
+import { useDoc } from "@/hooks/useDocs";
 import { MarkdownRenderer } from "@/components/docs/MarkdownRenderer";
 
 const READ_KEY = "protpure_docs_read";
@@ -34,30 +34,37 @@ function extractToc(source: string) {
 
 export default function DocPage() {
   const { slug = "" } = useParams();
-  const doc = getDoc(slug);
+  const { data: doc, isLoading, isError } = useDoc(slug);
 
   useEffect(() => {
     if (!doc) return;
     try {
       const raw = localStorage.getItem(READ_KEY);
       const arr: string[] = raw ? JSON.parse(raw) : [];
-      if (!arr.includes(doc.meta.slug)) {
-        arr.push(doc.meta.slug);
+      if (!arr.includes(doc.slug)) {
+        arr.push(doc.slug);
         localStorage.setItem(READ_KEY, JSON.stringify(arr));
       }
     } catch {}
   }, [doc]);
 
-  const toc = useMemo(() => (doc ? extractToc(doc.source) : []), [doc]);
+  const toc = useMemo(() => (doc ? extractToc(doc.body) : []), [doc]);
 
-  if (!doc) return <Navigate to="/documents" replace />;
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground">
+        <Loader2 className="w-5 h-5 animate-spin mr-2" /> Loading…
+      </div>
+    );
+  }
+  if (isError || !doc) return <Navigate to="/documents" replace />;
 
   const downloadMd = () => {
-    const blob = new Blob([doc.source], { type: "text/markdown" });
+    const blob = new Blob([doc.body], { type: "text/markdown" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${doc.meta.number}-${doc.meta.slug}.md`;
+    a.download = `${doc.number}-${doc.slug}.md`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -87,12 +94,12 @@ export default function DocPage() {
         <article>
           <div className="mb-8">
             <span className="font-mono text-xs text-muted-foreground tracking-wider">
-              {doc.meta.number}
+              {doc.number}
             </span>
-            <h1 className="font-serif text-3xl md:text-4xl mt-2 mb-3">{doc.meta.title}</h1>
-            <p className="text-muted-foreground">{doc.meta.summary}</p>
+            <h1 className="font-serif text-3xl md:text-4xl mt-2 mb-3">{doc.title}</h1>
+            <p className="text-muted-foreground">{doc.summary}</p>
           </div>
-          <MarkdownRenderer source={doc.source} />
+          <MarkdownRenderer source={doc.body} />
         </article>
 
         {toc.length > 0 && (

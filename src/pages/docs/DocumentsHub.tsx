@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Download, Lock, FileText, CheckCircle2, ChevronRight } from "lucide-react";
+import { ArrowLeft, Download, Lock, FileText, CheckCircle2, ChevronRight, Loader2 } from "lucide-react";
 import JSZip from "jszip";
 import { Button } from "@/components/ui/button";
-import { DOCS, SOURCES, type DocMeta } from "@/content/docs/_meta";
+import { supabase } from "@/integrations/supabase/client";
+import { useDocAuth } from "@/context/DocAuthContext";
+import { useDocsList, type DocMeta } from "@/hooks/useDocs";
 
 const READ_KEY = "protpure_docs_read";
 
@@ -37,7 +39,7 @@ function DocCard({ doc, isRead }: { doc: DocMeta; isRead: boolean }) {
       <h3 className="font-serif text-lg text-foreground mb-2">{doc.title}</h3>
       <p className="text-sm text-muted-foreground leading-relaxed flex-1">{doc.summary}</p>
       <div className="flex items-center justify-between mt-5 pt-4 border-t border-border text-xs text-muted-foreground">
-        <span>{doc.readTime} · {doc.diagramCount} diagram{doc.diagramCount === 1 ? "" : "s"}</span>
+        <span>{doc.read_time} · {doc.diagram_count} diagram{doc.diagram_count === 1 ? "" : "s"}</span>
         <span className="flex items-center gap-1 text-foreground group-hover:text-primary transition-colors">
           Open <ChevronRight className="w-3 h-3" />
         </span>
@@ -48,21 +50,35 @@ function DocCard({ doc, isRead }: { doc: DocMeta; isRead: boolean }) {
 
 export default function DocumentsHub() {
   const read = useReadSet();
-  const publicDocs = DOCS.filter((d) => !d.internal);
-  const internalDocs = DOCS.filter((d) => d.internal);
+  const { token } = useDocAuth();
+  const { data: docs = [], isLoading } = useDocsList();
+  const [zipping, setZipping] = useState(false);
+  const publicDocs = docs.filter((d) => !d.internal);
+  const internalDocs = docs.filter((d) => d.internal);
 
   const downloadAll = async () => {
-    const zip = new JSZip();
-    DOCS.forEach((d) => {
-      zip.file(`${d.number}-${d.slug}.md`, SOURCES[d.slug]);
-    });
-    const blob = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "protpure-docs.zip";
-    a.click();
-    URL.revokeObjectURL(url);
+    if (!token) return;
+    setZipping(true);
+    try {
+      const zip = new JSZip();
+      for (const d of docs) {
+        const { data, error } = await supabase.functions.invoke("docs-content", {
+          body: { token, slug: d.slug },
+        });
+        if (error) throw error;
+        const body = (data as { doc?: { body: string } })?.doc?.body ?? "";
+        zip.file(`${d.number}-${d.slug}.md`, body);
+      }
+      const blob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "protpure-docs.zip";
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setZipping(false);
+    }
   };
 
   return (
@@ -83,8 +99,9 @@ export default function DocumentsHub() {
               </span>
             </div>
           </div>
-          <Button onClick={downloadAll} variant="outline" size="sm">
-            <Download className="w-4 h-4 mr-2" /> Download all (.zip)
+          <Button onClick={downloadAll} variant="outline" size="sm" disabled={zipping || isLoading || docs.length === 0}>
+            {zipping ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+            Download all (.zip)
           </Button>
         </div>
 

@@ -1,31 +1,54 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 interface DocAuthCtx {
+  token: string | null;
   unlocked: boolean;
-  unlock: () => void;
+  unlock: (token: string, expiresAt: number) => void;
   lock: () => void;
 }
 
-const KEY = "protpure_docs_unlocked";
+const TOKEN_KEY = "protpure_docs_token";
+const EXP_KEY = "protpure_docs_token_exp";
 const Ctx = createContext<DocAuthCtx | null>(null);
 
+function readStoredToken(): string | null {
+  try {
+    const t = sessionStorage.getItem(TOKEN_KEY);
+    const exp = Number(sessionStorage.getItem(EXP_KEY) ?? "0");
+    if (!t || !exp) return null;
+    if (exp * 1000 < Date.now()) {
+      sessionStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(EXP_KEY);
+      return null;
+    }
+    return t;
+  } catch {
+    return null;
+  }
+}
+
 export function DocAuthProvider({ children }: { children: ReactNode }) {
-  const [unlocked, setUnlocked] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    if (sessionStorage.getItem(KEY) === "1") setUnlocked(true);
+    const t = readStoredToken();
+    if (t) setToken(t);
   }, []);
 
-  const unlock = () => {
-    sessionStorage.setItem(KEY, "1");
-    setUnlocked(true);
+  const unlock = (newToken: string, expiresAt: number) => {
+    sessionStorage.setItem(TOKEN_KEY, newToken);
+    sessionStorage.setItem(EXP_KEY, String(expiresAt));
+    setToken(newToken);
   };
   const lock = () => {
-    sessionStorage.removeItem(KEY);
-    setUnlocked(false);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(EXP_KEY);
+    setToken(null);
   };
 
-  return <Ctx.Provider value={{ unlocked, unlock, lock }}>{children}</Ctx.Provider>;
+  return (
+    <Ctx.Provider value={{ token, unlocked: !!token, unlock, lock }}>{children}</Ctx.Provider>
+  );
 }
 
 export function useDocAuth() {
