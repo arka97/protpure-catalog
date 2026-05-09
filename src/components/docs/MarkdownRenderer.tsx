@@ -11,7 +11,7 @@ function Mermaid({ chart }: { chart: string }) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const mod = await import(/* @vite-ignore */ "mermaid" as string);
+      const mod = await import("mermaid");
       const mermaid = mod.default;
       mermaid.initialize({ startOnLoad: false, theme: "neutral", securityLevel: "strict" });
       if (cancelled || !ref.current) return;
