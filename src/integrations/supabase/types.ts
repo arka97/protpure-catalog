@@ -14,7 +14,96 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          applications: string[]
+          chemical_stability: string
+          chromatography_type: Database["public"]["Enums"]["chromatography_type"]
+          created_at: string
+          dbc: string
+          dbc_unit: string
+          delivery_time: string
+          exchanger_type: Database["public"]["Enums"]["exchanger_type"] | null
+          flow_spec: string
+          flow_variant: Database["public"]["Enums"]["flow_variant"]
+          id: string
+          ionic_capacity: string | null
+          ligand: string
+          matrix: string
+          max_flow_velocity: string
+          name: string
+          pack_sizes: Json
+          particle_size_d50v: string
+          particle_size_range: string
+          ph_cip: string
+          ph_operational: string
+          sort_order: number
+          status: Database["public"]["Enums"]["product_status"]
+          storage: string
+          subtitle: string
+          tags: string[]
+          updated_at: string
+        }
+        Insert: {
+          applications?: string[]
+          chemical_stability: string
+          chromatography_type: Database["public"]["Enums"]["chromatography_type"]
+          created_at?: string
+          dbc: string
+          dbc_unit: string
+          delivery_time: string
+          exchanger_type?: Database["public"]["Enums"]["exchanger_type"] | null
+          flow_spec: string
+          flow_variant?: Database["public"]["Enums"]["flow_variant"]
+          id: string
+          ionic_capacity?: string | null
+          ligand: string
+          matrix: string
+          max_flow_velocity: string
+          name: string
+          pack_sizes?: Json
+          particle_size_d50v: string
+          particle_size_range: string
+          ph_cip: string
+          ph_operational: string
+          sort_order?: number
+          status?: Database["public"]["Enums"]["product_status"]
+          storage: string
+          subtitle: string
+          tags?: string[]
+          updated_at?: string
+        }
+        Update: {
+          applications?: string[]
+          chemical_stability?: string
+          chromatography_type?: Database["public"]["Enums"]["chromatography_type"]
+          created_at?: string
+          dbc?: string
+          dbc_unit?: string
+          delivery_time?: string
+          exchanger_type?: Database["public"]["Enums"]["exchanger_type"] | null
+          flow_spec?: string
+          flow_variant?: Database["public"]["Enums"]["flow_variant"]
+          id?: string
+          ionic_capacity?: string | null
+          ligand?: string
+          matrix?: string
+          max_flow_velocity?: string
+          name?: string
+          pack_sizes?: Json
+          particle_size_d50v?: string
+          particle_size_range?: string
+          ph_cip?: string
+          ph_operational?: string
+          sort_order?: number
+          status?: Database["public"]["Enums"]["product_status"]
+          storage?: string
+          subtitle?: string
+          tags?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +112,14 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      chromatography_type: "iec" | "affinity" | "sec" | "hic" | "magnetic"
+      exchanger_type:
+        | "strong-cation"
+        | "weak-cation"
+        | "strong-anion"
+        | "weak-anion"
+      flow_variant: "faster" | "standard" | "precise" | "hr"
+      product_status: "available" | "evaluation" | "pipeline"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +246,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      chromatography_type: ["iec", "affinity", "sec", "hic", "magnetic"],
+      exchanger_type: [
+        "strong-cation",
+        "weak-cation",
+        "strong-anion",
+        "weak-anion",
+      ],
+      flow_variant: ["faster", "standard", "precise", "hr"],
+      product_status: ["available", "evaluation", "pipeline"],
+    },
   },
 } as const

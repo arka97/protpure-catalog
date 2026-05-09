@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { Product } from "@/data/products";
+import { useSessionState } from "@/lib/persisted-state";
 
 interface Ctx {
   ids: string[];
@@ -16,7 +16,7 @@ const MAX = 3;
 const CompareCtx = createContext<Ctx | null>(null);
 
 export function CompareProvider({ children }: { children: ReactNode }) {
-  const [ids, setIds] = useState<string[]>([]);
+  const [ids, setIds] = useSessionState<string[]>("protpure_compare_ids", []);
   const [isOpen, setOpen] = useState(false);
   const value: Ctx = {
     ids,

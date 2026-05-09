@@ -1,5 +1,6 @@
-import { createContext, useContext, useReducer, ReactNode, useState } from "react";
-import { Product, PackSize } from "@/data/products";
+import { createContext, useContext, ReactNode, useState } from "react";
+import type { Product, PackSize } from "@/types/product";
+import { useSessionState } from "@/lib/persisted-state";
 
 export interface RFQItem {
   id: string; // unique per product+pack
@@ -7,60 +8,6 @@ export interface RFQItem {
   pack: PackSize;
   quantity: number;
   notes: string;
-}
-
-type Action =
-  | { type: "ADD_ITEM"; product: Product; pack: PackSize }
-  | { type: "REMOVE_ITEM"; id: string }
-  | { type: "UPDATE_QUANTITY"; id: string; quantity: number }
-  | { type: "UPDATE_NOTES"; id: string; notes: string }
-  | { type: "UPDATE_PACK"; id: string; pack: PackSize }
-  | { type: "CLEAR_CART" };
-
-function reducer(state: RFQItem[], action: Action): RFQItem[] {
-  switch (action.type) {
-    case "ADD_ITEM": {
-      const id = `${action.product.id}__${action.pack.catNo}`;
-      const existing = state.find((i) => i.id === id);
-      if (existing) {
-        return state.map((i) =>
-          i.id === id ? { ...i, quantity: i.quantity + 1 } : i
-        );
-      }
-      return [
-        ...state,
-        { id, product: action.product, pack: action.pack, quantity: 1, notes: "" },
-      ];
-    }
-    case "REMOVE_ITEM":
-      return state.filter((i) => i.id !== action.id);
-    case "UPDATE_QUANTITY":
-      return state.map((i) =>
-        i.id === action.id ? { ...i, quantity: Math.max(1, action.quantity) } : i
-      );
-    case "UPDATE_NOTES":
-      return state.map((i) => (i.id === action.id ? { ...i, notes: action.notes } : i));
-    case "UPDATE_PACK": {
-      const item = state.find((i) => i.id === action.id);
-      if (!item) return state;
-      const newId = `${item.product.id}__${action.pack.catNo}`;
-      if (newId === action.id) return state;
-      const existing = state.find((i) => i.id === newId);
-      if (existing) {
-        // Merge quantities, drop the old line
-        return state
-          .filter((i) => i.id !== action.id)
-          .map((i) =>
-            i.id === newId ? { ...i, quantity: i.quantity + item.quantity } : i
-          );
-      }
-      return state.map((i) =>
-        i.id === action.id ? { ...i, id: newId, pack: action.pack } : i
-      );
-    }
-    case "CLEAR_CART":
-      return [];
-  }
 }
 
 interface Ctx {
@@ -77,24 +24,67 @@ interface Ctx {
 }
 
 const RFQCtx = createContext<Ctx | null>(null);
+const STORAGE_KEY = "protpure_rfq_items";
 
 export function RFQProvider({ children }: { children: ReactNode }) {
-  const [items, dispatch] = useReducer(reducer, []);
+  const [items, setItems] = useSessionState<RFQItem[]>(STORAGE_KEY, []);
   const [isOpen, setOpen] = useState(false);
+
+  const addItem = (product: Product, pack: PackSize) => {
+    setItems((state) => {
+      const id = `${product.id}__${pack.catNo}`;
+      const existing = state.find((i) => i.id === id);
+      if (existing) {
+        return state.map((i) =>
+          i.id === id ? { ...i, quantity: i.quantity + 1 } : i,
+        );
+      }
+      return [...state, { id, product, pack, quantity: 1, notes: "" }];
+    });
+    setOpen(true);
+  };
+
+  const removeItem = (id: string) =>
+    setItems((s) => s.filter((i) => i.id !== id));
+
+  const updateQuantity = (id: string, quantity: number) =>
+    setItems((s) =>
+      s.map((i) => (i.id === id ? { ...i, quantity: Math.max(1, quantity) } : i)),
+    );
+
+  const updateNotes = (id: string, notes: string) =>
+    setItems((s) => s.map((i) => (i.id === id ? { ...i, notes } : i)));
+
+  const updatePack = (id: string, pack: PackSize) =>
+    setItems((state) => {
+      const item = state.find((i) => i.id === id);
+      if (!item) return state;
+      const newId = `${item.product.id}__${pack.catNo}`;
+      if (newId === id) return state;
+      const existing = state.find((i) => i.id === newId);
+      if (existing) {
+        return state
+          .filter((i) => i.id !== id)
+          .map((i) =>
+            i.id === newId ? { ...i, quantity: i.quantity + item.quantity } : i,
+          );
+      }
+      return state.map((i) => (i.id === id ? { ...i, id: newId, pack } : i));
+    });
+
+  const clearCart = () => setItems([]);
+
   const value: Ctx = {
     items,
     count: items.reduce((s, i) => s + i.quantity, 0),
     isOpen,
     setOpen,
-    addItem: (product, pack) => {
-      dispatch({ type: "ADD_ITEM", product, pack });
-      setOpen(true);
-    },
-    removeItem: (id) => dispatch({ type: "REMOVE_ITEM", id }),
-    updateQuantity: (id, quantity) => dispatch({ type: "UPDATE_QUANTITY", id, quantity }),
-    updateNotes: (id, notes) => dispatch({ type: "UPDATE_NOTES", id, notes }),
-    updatePack: (id, pack) => dispatch({ type: "UPDATE_PACK", id, pack }),
-    clearCart: () => dispatch({ type: "CLEAR_CART" }),
+    addItem,
+    removeItem,
+    updateQuantity,
+    updateNotes,
+    updatePack,
+    clearCart,
   };
   return <RFQCtx.Provider value={value}>{children}</RFQCtx.Provider>;
 }
