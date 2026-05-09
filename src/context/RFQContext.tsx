@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode, useState, useEffect } from "react";
+import { createContext, useContext, ReactNode, useState } from "react";
 import type { Product, PackSize } from "@/types/product";
 import { useSessionState } from "@/lib/persisted-state";
 
