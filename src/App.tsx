@@ -11,6 +11,10 @@ import Resources from "./pages/Resources.tsx";
 import Applications from "./pages/Applications.tsx";
 import Contact from "./pages/Contact.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import DocumentsHub from "./pages/docs/DocumentsHub.tsx";
+import DocPage from "./pages/docs/DocPage.tsx";
+import { DocAuthProvider } from "./context/DocAuthContext";
+import { PasswordGate } from "./components/docs/PasswordGate";
 import { RFQProvider } from "./context/RFQContext";
 import { RFQDrawer } from "./components/rfq/RFQDrawer";
 import { CompareProvider } from "./context/CompareContext";
@@ -36,6 +40,26 @@ const App = () => (
               <Route path="/procurement" element={<Navigate to="/about" replace />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/resources" element={<Resources />} />
+              <Route
+                path="/documents"
+                element={
+                  <DocAuthProvider>
+                    <PasswordGate>
+                      <DocumentsHub />
+                    </PasswordGate>
+                  </DocAuthProvider>
+                }
+              />
+              <Route
+                path="/documents/:slug"
+                element={
+                  <DocAuthProvider>
+                    <PasswordGate>
+                      <DocPage />
+                    </PasswordGate>
+                  </DocAuthProvider>
+                }
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
             <RFQDrawer />
