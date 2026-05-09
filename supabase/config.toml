@@ -1,3 +1,6 @@
 project_id = "bmwjaulhlbmnfptuszoj"
 [functions.verify-doc-password]
 verify_jwt = false
+
+[functions.docs-content]
+verify_jwt = false
