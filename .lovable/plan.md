@@ -1,101 +1,36 @@
-# Refactor Plan
+# Plan: Email admin on RFQ + Contact form submissions
 
-Behavior and visible UI stay the same. Public URLs unchanged. Docs hub content untouched. Catalog data preserved (migrated, not rewritten).
+When a user submits the **RFQ drawer** ("Submit RFQ") or the **Contact form** ("Send message"), an email will be sent to **sales@protpure.com** containing all submitted details. Emails come from **notify@protpure.com**.
 
-## 1. Folder & file structure
+## Step 1 — Set up sender email domain
 
-Reorganize `src/` around features instead of mixed buckets.
+The project already uses **protpure.com** as its custom domain. The first step is configuring email sending through that domain.
 
-```text
-src/
-  app/                    App.tsx, providers.tsx, router.tsx
-  features/
-    products/             card, filter-sidebar, detail-modal, find-your-resin, compare-bar, compare-modal
-    rfq/                  drawer + sub-pieces (header, line-item, footer, submit-form)
-    docs/                 password-gate, markdown-renderer, mermaid (split out)
-    home/                 hero, usp-grid, category-grid, resin-selector, ...
-    contact/              form, info-panel (extracted from Contact.tsx)
-    about/                story, team, values (extracted from About.tsx)
-  components/
-    layout/               header, footer, page-hero, whatsapp-fab
-    ui/                   shadcn primitives (untouched)
-  hooks/                  useProducts, useFilteredProducts, useResinFinder, ...
-  lib/                    utils, format, constants
-  types/                  product.ts, rfq.ts, doc.ts (moved out of data/context files)
-  data/                   queries.ts (TanStack Query hooks for products), seed.ts
-  content/docs/           unchanged
-  context/                rfq, compare, doc-auth (slim wrappers around hooks)
-  pages/                  thin route components (Home, Products, About, ...)
-  integrations/supabase/  unchanged (auto-generated)
-```
+After approving this plan, you'll be prompted with a "Set up email domain" button. This will set up `notify.protpure.com` as the sender subdomain. Once DNS verification completes, emails start sending automatically.
 
-- Delete stray `PRODUCTS_ADDITIONS.ts` (already merged or obsolete — verify first, archive contents into a migration if needed).
-- Collapse `pages/Index.tsx` (2-line wrapper) into the route definition.
+## Step 2 — Backend email infrastructure
 
-## 2. Component decomposition
+- Provision the email queue + send pipeline (durable, with retries and rate-limit handling).
+- Create two branded email templates:
+  1. **RFQ submission** — recipient details (name, company, email, phone, country), additional requirements, and a table of all line items (product name, pack size + cat no, quantity, notes).
+  2. **Contact form submission** — name, company, email, message.
+- Both emails sent **to `sales@protpure.com`**, with `Reply-To` set to the submitter's email so you can reply directly from your inbox.
+- Emails come from `notify@protpure.com`, matching the project's domain.
+- Styled to match the ProtPure brand (navy/teal, serif headings, white body background).
 
-Targets (currently large, mixing concerns):
+## Step 3 — Wire up the forms
 
-| File | Lines | Split into |
-|---|---|---|
-| `pages/About.tsx` | 320 | `AboutHero`, `AboutStory`, `AboutValues`, `AboutTeam`, `AboutCTA` |
-| `pages/Contact.tsx` | 250 | `ContactForm`, `ContactInfo`, `ContactMap`, `ContactFAQ` |
-| `pages/Technology.tsx` | 180 | `TechHero`, `TechProcess`, `TechSpecs` sections |
-| `components/rfq/RFQDrawer.tsx` | 249 | `RFQHeader`, `RFQLineItem`, `RFQFooter`, `RFQSubmitForm` |
-| `components/products/ProductDetailModal.tsx` | 219 | `SpecTable`, `PackSizePicker`, `ApplicationsList` |
-| `components/products/FilterSidebar.tsx` | 169 | `FilterGroup`, `FilterChips` + `useProductFilters` hook |
-| `components/home/ResinSelector.tsx` | 218 | `ResinQuestionStep`, `ResinResultCard` + `useResinFinder` hook |
-| `components/layout/Header.tsx` | 168 | `DesktopNav`, `MobileNav`, `HeaderCTAs` |
-| `data/products.ts` | 394 | Move types to `types/product.ts`; keep data export only |
+- **`RFQDrawer.tsx`**: in `handleSubmit`, after Zod validation passes, invoke the send function with the form data + cart items, then show the existing success state.
+- **`Contact.tsx`**: in `onSubmit`, after Zod validation passes, invoke the send function, then show the existing toast.
+- Both calls fire-and-show-success (errors are toasted but don't block the UX — transient queue hiccups won't lose a submission).
 
-Rule: any component file > 150 lines or mixing 3+ responsibilities gets split.
+## Out of scope
 
-## 3. State & data layer
+- No storage of submissions in the database (email-only). Say the word if you also want a record table for an admin dashboard.
+- No auto-reply to the submitter (the existing on-screen confirmation covers that). Easy to add later if you want.
 
-- **Move `DocAuthProvider` up once** in `app/providers.tsx` instead of being mounted twice (per route in `App.tsx`). Scope stays effectively docs-only because nothing else reads it.
-- **Extract reducer + types** from `RFQContext.tsx` into `features/rfq/state.ts`; context becomes a thin provider.
-- **Persist RFQ cart and Compare set** to `sessionStorage` (no behavior change visible, just survives refresh — moderate-risk add, no UI shift).
-- **Centralize types** under `src/types/` (`Product`, `PackSize`, `RFQItem`, `DocMeta`, ...). Existing files re-export for backwards compatibility during transition.
-- **Introduce TanStack Query hooks** (`useProducts`, `useProduct(id)`) wrapping the data source — paves the way for the database move.
+## Technical notes
 
-## 4. Design system cleanup
-
-- Audit components for raw color usage. Replace ad-hoc classes (`text-white`, `bg-black`, hex literals if any) with semantic tokens.
-- Keep brand tokens (`navy`, `teal`, ...) but normalize: any place using `text-navy` for foreground should use `text-foreground` when semantically generic. Brand tokens stay for explicitly branded surfaces (hero, CTA bands).
-- Add missing semantic mappings in `index.css` if a token is repeatedly inlined.
-- Standardize button/badge variants — pick ones that exist in shadcn variants instead of one-off Tailwind combos.
-- Extract repeated class strings (e.g. card surfaces, focus rings) into small `cva` variants or `cn()` helpers in `lib/styles.ts`.
-- No visible style changes; this is a token hygiene pass.
-
-## 5. Database migration (catalog → Lovable Cloud)
-
-Move the static catalog from `src/data/products.ts` into a database table so it can be edited without redeploying.
-
-- New table `products` with columns mirroring the `Product` interface; arrays for `tags`, `applications`, `pack_sizes` (JSONB).
-- RLS: `SELECT` allowed for everyone (anon + authenticated). No insert/update/delete policies (admin edits via SQL for now — admin UI is out of scope).
-- Seed migration inserts current catalog rows from `products.ts` + the entries staged in `PRODUCTS_ADDITIONS.ts`.
-- Replace direct `import { products }` with `useProducts()` (TanStack Query → Supabase). Loading + empty + error states added to consuming pages (skeletons matching existing card layout — no visual regression).
-- Keep `src/data/products.ts` temporarily as a fallback constant for tests, then delete in a follow-up.
-
-## 6. Verification
-
-- Build passes.
-- Manual click-through on `/`, `/products`, `/applications`, `/about`, `/technology`, `/contact`, `/resources`, `/documents`.
-- RFQ add → drawer → submit still works.
-- Compare flow still works.
-- Docs password gate still works (single provider mount).
-- No URL changes; `/procurement` still redirects to `/about`.
-
-## What is NOT changing
-
-- Public routes/URLs.
-- Visible UI / styling output.
-- The 14 docs and password gate behavior.
-- shadcn `ui/*` primitives.
-- Auto-generated Supabase client/types files.
-
-## Risks
-
-- Catalog DB move is the highest-risk piece (network call replaces sync import). Mitigation: TanStack Query with `staleTime: Infinity` + skeletons; keep the static file behind a feature flag for one release if needed.
-- Folder moves can break editor bookmarks and any external links to specific files. Internal imports updated atomically.
-- `DocAuthProvider` move is safe because the gate already reads from `sessionStorage`.
+- Uses Lovable's built-in email infrastructure (no third-party API keys).
+- New edge function templates: `rfq-submission`, `contact-submission`.
+- Idempotency keys derived from a per-submission UUID so retries never duplicate.
