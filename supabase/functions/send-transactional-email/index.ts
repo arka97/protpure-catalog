@@ -16,6 +16,48 @@ const SENDER_DOMAIN = "notify.protpure.com"
 // even though actual sending uses the subdomain above.
 const FROM_DOMAIN = "protpure.com"
 
+// Allowed origins for unauthenticated (anon) callers. Requests from other
+// origins are rejected to prevent third-party abuse of the email endpoint.
+const ALLOWED_ORIGINS = [
+  "https://protpure.com",
+  "https://www.protpure.com",
+  "https://protpure.lovable.app",
+]
+const ALLOWED_ORIGIN_SUFFIXES = [".lovable.app", ".lovable.dev"]
+
+// Simple in-memory IP rate limiter (per-instance). Caps abusive bursts
+// from a single IP. Not a substitute for a global limiter but sufficient
+// to mitigate casual spam.
+const RATE_LIMIT_WINDOW_MS = 60_000
+const RATE_LIMIT_MAX = 5
+const ipHits = new Map<string, number[]>()
+function isRateLimited(ip: string): boolean {
+  const now = Date.now()
+  const arr = (ipHits.get(ip) ?? []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS)
+  arr.push(now)
+  ipHits.set(ip, arr)
+  return arr.length > RATE_LIMIT_MAX
+}
+
+function isOriginAllowed(origin: string | null): boolean {
+  if (!origin) return false
+  if (ALLOWED_ORIGINS.includes(origin)) return true
+  try {
+    const host = new URL(origin).hostname
+    return ALLOWED_ORIGIN_SUFFIXES.some((s) => host.endsWith(s))
+  } catch {
+    return false
+  }
+}
+
+// RFC 5322-ish email validation (sufficient for header-injection defense).
+const EMAIL_RE = /^[^\s<>"'\\,;:()\[\]]+@[^\s<>"'\\,;:()\[\]]+\.[^\s<>"'\\,;:()\[\]]+$/
+function isValidEmailAddress(value: string): boolean {
+  if (value.length > 254) return false
+  if (/[\r\n\t\0]/.test(value)) return false
+  return EMAIL_RE.test(value)
+}
+
 // Generate a cryptographically random 32-byte hex token
 function generateToken(): string {
   const bytes = new Uint8Array(32)
@@ -33,6 +75,29 @@ Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
+  }
+
+  // Origin allowlist — reject calls from outside our own apps
+  const origin = req.headers.get('origin')
+  if (!isOriginAllowed(origin)) {
+    console.warn('Blocked request from disallowed origin', { origin })
+    return new Response(JSON.stringify({ error: 'Forbidden' }), {
+      status: 403,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
+
+  // Per-IP rate limit
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0].trim() ||
+    req.headers.get('cf-connecting-ip') ||
+    'unknown'
+  if (isRateLimited(ip)) {
+    console.warn('Rate limit exceeded', { ip })
+    return new Response(JSON.stringify({ error: 'Too many requests' }), {
+      status: 429,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -75,6 +140,19 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     )
+  }
+
+  // Validate replyTo to prevent email header injection
+  if (replyTo !== undefined) {
+    if (!isValidEmailAddress(replyTo)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid replyTo address' }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      )
+    }
   }
 
   if (!templateName) {
