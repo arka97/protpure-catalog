@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Linkedin, MessageCircle, ExternalLink } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
@@ -58,7 +59,7 @@ export default function Contact() {
   const [form, setForm] = useState({ name: "", company: "", email: "", message: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const r = schema.safeParse(form);
     if (!r.success) {
@@ -68,6 +69,25 @@ export default function Contact() {
       return;
     }
     setErrors({});
+    const submissionId = crypto.randomUUID();
+    supabase.functions
+      .invoke("send-transactional-email", {
+        body: {
+          templateName: "contact-submission",
+          idempotencyKey: `contact-${submissionId}`,
+          replyTo: form.email,
+          templateData: {
+            name: form.name,
+            company: form.company,
+            email: form.email,
+            message: form.message,
+          },
+        },
+      })
+      .catch((err) => {
+        console.error("Failed to send contact email", err);
+        toast.error("We couldn't deliver your message — please try again or email info@protpure.com");
+      });
     toast.success("Message received", {
       description: "We'll respond within 24–48 hours at info@protpure.com",
     });

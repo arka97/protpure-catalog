@@ -11,6 +11,7 @@ import Resources from "./pages/Resources.tsx";
 import Applications from "./pages/Applications.tsx";
 import Contact from "./pages/Contact.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import Unsubscribe from "./pages/Unsubscribe.tsx";
 import DocumentsHub from "./pages/docs/DocumentsHub.tsx";
 import DocPage from "./pages/docs/DocPage.tsx";
 import { DocAuthProvider } from "./context/DocAuthContext";
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/procurement" element={<Navigate to="/about" replace />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/resources" element={<Resources />} />
+              <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route
                 path="/documents"
                 element={

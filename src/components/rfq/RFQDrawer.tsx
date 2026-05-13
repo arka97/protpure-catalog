@@ -16,6 +16,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { z } from "zod";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const formSchema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
@@ -57,6 +58,34 @@ export function RFQDrawer() {
       return;
     }
     setErrors({});
+    const submissionId = crypto.randomUUID();
+    supabase.functions
+      .invoke("send-transactional-email", {
+        body: {
+          templateName: "rfq-submission",
+          idempotencyKey: `rfq-${submissionId}`,
+          replyTo: form.email,
+          templateData: {
+            name: form.name,
+            company: form.company,
+            email: form.email,
+            phone: form.phone,
+            country: form.country,
+            requirements: form.requirements,
+            items: items.map((it) => ({
+              productName: it.product.name,
+              packSize: it.pack.size,
+              catNo: it.pack.catNo,
+              quantity: it.quantity,
+              notes: it.notes,
+            })),
+          },
+        },
+      })
+      .catch((err) => {
+        console.error("Failed to send RFQ email", err);
+        toast.error("We couldn't deliver your RFQ — please try again or email info@protpure.com");
+      });
     setSubmitted(true);
   };
 
