@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { format } from "date-fns";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/layout/PageHero";
@@ -10,6 +12,7 @@ import { Mail, Phone, MapPin, Linkedin, MessageCircle, ExternalLink } from "luci
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const schema = z.object({
   name: z.string().trim().min(1, "Name required").max(100),
@@ -58,6 +61,30 @@ const contactCards = [
 export default function Contact() {
   const [form, setForm] = useState({ name: "", company: "", email: "", message: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  type FeedPost = {
+    id: string;
+    url: string;
+    text: string;
+    publishedAt: string;
+    thumbnailUrl?: string;
+    tag?: string;
+  };
+
+  const { data: feed, isLoading: feedLoading } = useQuery({
+    queryKey: ["linkedin-company-feed"],
+    queryFn: async () => {
+      const { data, error } = await supabase.functions.invoke<{ source: string; posts: FeedPost[] }>(
+        "linkedin-company-feed",
+      );
+      if (error) throw error;
+      return data;
+    },
+    staleTime: 30 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  const posts: FeedPost[] = feed?.posts ?? [];
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -219,48 +246,52 @@ export default function Contact() {
               </a>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-4">
-              {[
-                {
-                  tag: "Launch",
-                  title: "Q Agarose Faster now shipping in 100 L industrial pack",
-                  body: "Strong anion exchange optimised for capture at 700 cm/hr. CoA-released, 2-week lead time ex-works Anand.",
-                },
-                {
-                  tag: "Application note",
-                  title: "mAb polishing on CM Agarose — case study",
-                  body: "Aggregate clearance >99% with single-step elution. Method transferable from 1 mL screening to 50 L preparative.",
-                },
-                {
-                  tag: "Facility",
-                  title: "600 L/month resin production capacity online",
-                  body: "Three cross-linking reactors (20, 50, 200 L) running on staggered schedule for continuous supply assurance.",
-                },
-              ].map((p) => (
-                <a
-                  key={p.title}
-                  href={LINKEDIN_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group rounded-xl border border-border bg-white p-6 hover:border-teal transition-colors flex flex-col"
-                >
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-md bg-[#0A66C2] flex items-center justify-center">
-                      <Linkedin className="w-4 h-4 text-white" />
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {feedLoading
+                ? Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="rounded-xl border border-border bg-white p-6 flex flex-col gap-3">
+                      <Skeleton className="h-8 w-8 rounded-md" />
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-5/6" />
+                      <Skeleton className="h-4 w-3/4" />
                     </div>
-                    <div className="text-[10px] uppercase tracking-wider text-teal font-semibold">
-                      {p.tag}
-                    </div>
-                  </div>
-                  <h3 className="font-serif text-lg text-navy mb-2 group-hover:text-teal transition-colors">
-                    {p.title}
-                  </h3>
-                  <p className="text-[13px] text-slate leading-relaxed flex-1">{p.body}</p>
-                  <div className="mt-4 text-[12px] text-slate-light flex items-center gap-1">
-                    Read on LinkedIn <ExternalLink className="w-3 h-3" />
-                  </div>
-                </a>
-              ))}
+                  ))
+                : posts.map((p) => (
+                    <a
+                      key={p.id}
+                      href={p.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group rounded-xl border border-border bg-white p-6 hover:border-teal transition-colors flex flex-col"
+                    >
+                      <div className="flex items-center gap-2 mb-4">
+                        <div className="w-8 h-8 rounded-md bg-[#0A66C2] flex items-center justify-center">
+                          <Linkedin className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="text-[10px] uppercase tracking-wider text-teal font-semibold">
+                          {p.tag ?? format(new Date(p.publishedAt), "MMM d, yyyy")}
+                        </div>
+                      </div>
+                      {p.thumbnailUrl && (
+                        <img
+                          src={p.thumbnailUrl}
+                          alt=""
+                          loading="lazy"
+                          className="w-full h-32 object-cover rounded-md mb-3 border border-border"
+                        />
+                      )}
+                      <p className="text-[13px] text-slate leading-relaxed flex-1 whitespace-pre-line">
+                        {p.text}
+                      </p>
+                      <div className="mt-4 text-[12px] text-slate-light flex items-center justify-between">
+                        <span>{format(new Date(p.publishedAt), "MMM d, yyyy")}</span>
+                        <span className="flex items-center gap-1 group-hover:text-teal transition-colors">
+                          Read on LinkedIn <ExternalLink className="w-3 h-3" />
+                        </span>
+                      </div>
+                    </a>
+                  ))}
             </div>
           </div>
         </section>
