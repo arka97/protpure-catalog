@@ -1,52 +1,79 @@
-## Goal
+# Plan: Generate `docs/` handover pack
 
-Replace the hard-coded "Latest updates" cards on `/contact` with a live feed of the 5 most recent posts from the ProtPure LinkedIn company page (`protpure-tech-pvt-ltd`), pulled through the Lovable LinkedIn connector.
+Create a new top-level `docs/` folder containing 7 Markdown files that fully document the Protpure app for production handover and future AI sessions. Each file gets YAML frontmatter (`title`, `description`, `phase`, `last_updated`, `owner`). No app code changes — documentation only.
 
-## Important caveat about LinkedIn
+## Files to create
 
-LinkedIn's API restricts reading a company page's posts to apps with the `r_organization_social` (or Community Management) scope, which requires LinkedIn Marketing Developer Platform approval on the underlying OAuth app. The connector's standard scopes (`openid profile email w_member_social`) do not include this.
+### 1. `docs/MASTER_INDEX.md`
+- YAML frontmatter
+- One-paragraph project summary: Protpure marketing + lead-gen site (chromatography resins), RFQ-driven, no user accounts, Lovable Cloud backend
+- Navigation table linking (relative) to the other 6 docs
+- Current SDLC phase: **Production / Iterative enhancement** — active focus: RFQ conversion, LinkedIn feed, documents hub, transactional email reliability
+- Mermaid `timeline` diagram: Foundations → Product catalog & RFQ → Docs hub & email system → LinkedIn integration → Handover docs
 
-The plan handles both outcomes:
-- If the linked LinkedIn connection has organization read access → real posts render live.
-- If not → the edge function returns a curated fallback (the existing 3 cards extended to 5) so the UI is never broken, and we surface a small "Updated manually" note in dev console only.
+### 2. `docs/ARCHITECTURE.md`
+- Goals, non-goals, tech stack rationale (React 18 + Vite + TS, Tailwind + shadcn, TanStack Query, Lovable Cloud/Supabase, Deno edge functions, React Email)
+- Environment variables table (`VITE_SUPABASE_*`) + server-side secrets list (names only, no values): `DOCS_PASSWORD`, `LINKEDIN_API_KEY`, `LOVABLE_API_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, email queue key
+- Full directory tree of `src/`, `supabase/functions/`, `public/`
+- Mermaid `graph TD`: Browser → React app → (TanStack Query / Context) → Supabase JS → (Edge Functions / Postgres+RLS / pgmq queue / Resend)
 
-## User-facing behavior
+### 3. `docs/COMPONENT_TREE.md`
+- Route table from `src/App.tsx` (all 10 routes + guards)
+- Providers stack: QueryClient → Tooltip → BrowserRouter → RFQProvider → CompareProvider (+ DocAuthProvider scoped to `/documents`)
+- Global state: `RFQContext`, `CompareContext`, `DocAuthContext`, TanStack Query cache, persisted-state hook
+- Layouts: `Header`, `Footer`, `PageHero`, floating `RFQDrawer` + `WhatsAppFAB`
+- Feature component groupings (`home/`, `products/`, `docs/`, `rfq/`, `layout/`)
+- Mermaid `graph LR`: App → Providers → Routes → Pages → Feature components → Contexts
 
-- New section state: shows 5 cards in a responsive 1/2/3-column grid (same visual style as today).
-- Each card shows: post date, short text excerpt (~180 chars), optional thumbnail image, and a "Read on LinkedIn" link to the actual post URL.
-- Loading state: 5 skeleton cards.
-- Error/empty state: falls back to curated cards silently.
-- Auto-refresh: cached server-side for 30 minutes (LinkedIn rate-limit friendly).
+### 4. `docs/DATA_MODEL.md`
+- Data dictionary for each public table (`docs`, `products`, `email_send_log`, `email_send_state`, `email_unsubscribe_tokens`, `suppressed_emails`): columns, types, nullability, defaults, keys
+- Enums: `chromatography_type`, `exchanger_type`, `flow_variant`, `product_status`
+- RLS status + policies per table (queried live via `supabase--read_query` before writing) and GRANTs
+- Database functions: `enqueue_email`, `read_email_batch`, `delete_email`, `move_to_dlq`, `email_queue_dispatch`, `email_queue_wake`, `update_updated_at_column`
+- Mermaid `erDiagram`: tables + logical relationships (products is standalone; email tables share `email` string linkage; docs is standalone content store)
 
-## Implementation steps
+### 5. `docs/API_SPEC.md`
+- One section per edge function (`verify-doc-password`, `docs-content`, `send-transactional-email`, `process-email-queue`, `preview-transactional-email`, `handle-email-unsubscribe`, `handle-email-suppression`, `linkedin-company-feed`): purpose, HTTP method, `verify_jwt` setting from `config.toml`, request payload, response shape, auth requirements, error modes
+- External integrations: Resend (transactional email), LinkedIn API via connector, Lovable AI Gateway (if used)
+- Mermaid `sequenceDiagram`: Client → `supabase.functions.invoke("send-transactional-email")` → enqueue via `enqueue_email` RPC → pgmq → cron `email_queue_dispatch` → `process-email-queue` → Resend → `email_send_log`
 
-1. **Connect LinkedIn** — link the LinkedIn workspace connection to this project so `LINKEDIN_API_KEY` and `LOVABLE_API_KEY` are available to edge functions.
+### 6. `docs/SECURITY_AND_OPS.md`
+- Auth model: no end-user accounts; docs hub gated by shared password → JWT issued by `verify-doc-password` and stored in `sessionStorage`
+- Edge function security matrix (which have `verify_jwt`, which are public, why)
+- RLS enforcement summary + service-role usage boundaries
+- Secret management via Lovable Cloud (never exposed client-side), connector-managed `LINKEDIN_API_KEY`
+- Ops: pgmq email queue + cron dispatcher, retry/backoff via `email_send_state.retry_after_until`, suppression list, unsubscribe tokens
+- Hosting/deploy: Lovable Cloud, custom domains `protpure.com` / `www.protpure.com`
+- Export path: Lovable Cloud → Advanced settings → Export data
+- Mermaid `sequenceDiagram` for docs password → JWT → gated content flow
 
-2. **New edge function `linkedin-company-feed`** (`supabase/functions/linkedin-company-feed/index.ts`, `verify_jwt = false`, public read):
-   - Origin allowlist (same list used by `send-transactional-email`).
-   - In-memory 30-minute cache keyed by org URN.
-   - Calls the gateway:
-     - `GET /linkedin/v2/userinfo` to confirm auth.
-     - `GET /linkedin/rest/posts?q=author&author=urn:li:organization:{ORG_ID}&count=5&sortBy=LAST_MODIFIED` with `LinkedIn-Version: 202405` and `X-Restli-Protocol-Version: 2.0.0`.
-     - Resolves the organization URN via `GET /linkedin/v2/organizations?q=vanityName&vanityName=protpure-tech-pvt-ltd` (cached).
-   - Normalizes each post into `{ id, url, text, publishedAt, thumbnailUrl? }`.
-   - On any non-2xx (e.g. 403 missing scope), returns `{ source: "fallback", posts: [...curated 5...] }` with HTTP 200 so the page still renders.
+### 7. `docs/AI_CONVENTIONS.md`
+- Core rules: semantic HSL tokens only (no hardcoded colors), serif headings + sans body, shadcn variants, no dark-mode-breaking utilities
+- Backend rules: every public table needs GRANTs + RLS + policies in same migration; roles in a separate table (N/A today — no auth); never edit `src/integrations/supabase/client.ts` / `types.ts` / `.env`
+- Component rules: small focused files, RFQ is the single conversion path, keep UI changes out of business logic
+- Anti-patterns: hardcoded Tailwind colors, storing roles on profile tables, secrets in client code, adding backend servers, adding user accounts without explicit ask
+- Decision records: LinkedIn curated fallback, password-gated docs vs full auth, RFQ email idempotency, pgmq over external queue
+- Mermaid `mindmap`: root "Protpure guardrails" → Design / Backend / Security / UX / Content branches
 
-3. **Register function** in `supabase/config.toml` (`verify_jwt = false`).
+## Technical details
 
-4. **Frontend changes in `src/pages/Contact.tsx`**:
-   - Replace the static array with a `useQuery` (`@tanstack/react-query`) hook calling `supabase.functions.invoke("linkedin-company-feed")`.
-   - Render 5 cards mapped from the response. Keep current card styling (border, teal hover, LinkedIn badge, ExternalLink icon).
-   - Show `<Skeleton />` cards while loading.
-   - Format `publishedAt` as `MMM d, yyyy` using `date-fns` (already in deps).
+- All Mermaid blocks use fenced ` ```mermaid ` code blocks (already supported by `MarkdownRenderer`).
+- Frontmatter shape:
+  ```yaml
+  ---
+  title: Architecture
+  description: System goals, stack, and data flow
+  phase: production
+  last_updated: 2026-07-09
+  owner: Protpure engineering
+  ---
+  ```
+- Before writing `DATA_MODEL.md` and `SECURITY_AND_OPS.md`, run `supabase--read_query` to pull live column definitions, RLS policies, and GRANTs from `information_schema` / `pg_policies` so the docs match reality rather than the types file.
+- All internal links relative (e.g. `./ARCHITECTURE.md`).
+- No changes to app source, config, or migrations.
 
-5. **No design-token / business-logic changes** elsewhere. Curated fallback content lives in the edge function so it can be edited without redeploying the frontend.
+## Out of scope
 
-## Files
-
-- **New:** `supabase/functions/linkedin-company-feed/index.ts`, `supabase/functions/linkedin-company-feed/deno.json`
-- **Edited:** `src/pages/Contact.tsx`, `supabase/config.toml`
-
-## Open question I'll handle automatically
-
-If LinkedIn returns 403 for organization access, I'll keep the curated fallback live and tell you what scope/app-review step is required to unlock real posts. No action needed from you until then.
+- No new routes, no `/docs` viewer for these files (they live on the filesystem for the repo, not the running app).
+- No screenshots or generated images.
+- No changes to existing `src/pages/docs/*` (that's the password-gated product documents hub, unrelated to this repo docs folder).
