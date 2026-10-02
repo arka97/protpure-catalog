@@ -1,4 +1,4 @@
-import type { GradeId, Product, SpecRow, Variant } from "@/types/catalog";
+import type { GradeId, Product, SpecRow, Variant } from "../types/catalog";
 import { EMPTY_COLUMNS } from "./hardware";
 import { PACKS } from "./packs";
 
