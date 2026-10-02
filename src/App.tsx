@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, HashRouter, Navigate, Route, Routes } from "react-router-dom";
+import { BrowserRouter, MemoryRouter, Navigate, Route, Routes } from "react-router-dom";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Toaster } from "@/components/ui/sonner";
 import { CompareProvider } from "@/context/CompareContext";
@@ -17,14 +17,23 @@ const About = lazy(() => import("@/pages/About"));
 const Resources = lazy(() => import("@/pages/Resources"));
 const Contact = lazy(() => import("@/pages/Contact"));
 const Quote = lazy(() => import("@/pages/Quote"));
-const Unsubscribe = lazy(() => import("@/pages/Unsubscribe"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
-const DocsLayout = lazy(() => import("@/pages/docs/DocsLayout"));
-const DocumentsHub = lazy(() => import("@/pages/docs/DocumentsHub"));
-const DocPage = lazy(() => import("@/pages/docs/DocPage"));
 
-/* Static previews (a single HTML file with no server) set VITE_ROUTER=hash; the live site uses clean URLs. */
-const Router = import.meta.env.VITE_ROUTER === "hash" ? HashRouter : BrowserRouter;
+/*
+  The preview build (VITE_PREVIEW=true, see lib/env.ts) has no server and no backend: it keeps routing in
+  memory and leaves out the pages that need the backend. The check is written inline so the bundler can
+  drop their code from that build.
+*/
+const PREVIEW = import.meta.env.VITE_PREVIEW === "true";
+const Router = PREVIEW ? MemoryRouter : BrowserRouter;
+const Backend = PREVIEW
+  ? null
+  : {
+      Unsubscribe: lazy(() => import("@/pages/Unsubscribe")),
+      DocsLayout: lazy(() => import("@/pages/docs/DocsLayout")),
+      DocsHub: lazy(() => import("@/pages/docs/DocumentsHub")),
+      DocPage: lazy(() => import("@/pages/docs/DocPage")),
+    };
 
 const App = () => (
   <>
@@ -45,22 +54,24 @@ const App = () => (
               <Route path="/resources" element={<Resources />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/quote" element={<Quote />} />
-              <Route path="/unsubscribe" element={<Unsubscribe />} />
+              {Backend && <Route path="/unsubscribe" element={<Backend.Unsubscribe />} />}
               {/* Addresses from the previous site */}
               <Route path="/procurement" element={<Navigate to="/about" replace />} />
               <Route path="/company" element={<Navigate to="/about" replace />} />
               <Route path="*" element={<NotFound />} />
             </Route>
-            <Route
-              element={
-                <Suspense fallback={null}>
-                  <DocsLayout />
-                </Suspense>
-              }
-            >
-              <Route path="/documents" element={<DocumentsHub />} />
-              <Route path="/documents/:slug" element={<DocPage />} />
-            </Route>
+            {Backend && (
+              <Route
+                element={
+                  <Suspense fallback={null}>
+                    <Backend.DocsLayout />
+                  </Suspense>
+                }
+              >
+                <Route path="/documents" element={<Backend.DocsHub />} />
+                <Route path="/documents/:slug" element={<Backend.DocPage />} />
+              </Route>
+            )}
           </Routes>
         </CompareProvider>
       </RFQProvider>

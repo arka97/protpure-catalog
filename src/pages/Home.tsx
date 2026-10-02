@@ -14,7 +14,7 @@ import { Halftone } from "@/components/viz/Halftone";
 import { StatTile } from "@/components/viz/StatTile";
 import { useRFQ } from "@/context/RFQContext";
 import { APPLICATIONS } from "@/data/applications";
-import { FEATURED_SLUGS, productBySlug, productsByFamily, SKU_COUNT } from "@/data/catalog";
+import { CATALOGUE_COUNT, FEATURED_SLUGS, productBySlug, productsByFamily } from "@/data/catalog";
 import { FACILITY_FACTS, FOUNDER, INDUSTRIES } from "@/data/company";
 import { DEAE_PRECISE } from "@/data/evidence";
 import { familyById, RESIN_FAMILY_IDS } from "@/data/families";
@@ -36,7 +36,7 @@ function Hero() {
   const facts = [
     { value: "600 L", label: "monthly resin manufacturing capacity in Anand" },
     { value: String(RESIN_FAMILY_IDS.length), label: "separation chemistries on one agarose platform" },
-    { value: String(SKU_COUNT), label: "catalogue items, from 1 mL columns to 1 L packs" },
+    { value: String(CATALOGUE_COUNT), label: "catalogue items, from 1 mL columns to 1 L packs" },
   ];
   return (
     <section className="relative overflow-hidden border-b border-rule">

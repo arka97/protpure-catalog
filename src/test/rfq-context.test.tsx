@@ -1,11 +1,16 @@
 import type { ReactNode } from "react";
 import { act, renderHook } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { RFQProvider, useRFQ } from "@/context/RFQContext";
 
 vi.mock("sonner", () => ({ toast: vi.fn() }));
 
-const wrapper = ({ children }: { children: ReactNode }) => <RFQProvider>{children}</RFQProvider>;
+const wrapper = ({ children }: { children: ReactNode }) => (
+  <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+    <RFQProvider>{children}</RFQProvider>
+  </MemoryRouter>
+);
 
 const resin = {
   id: "SPFF01",

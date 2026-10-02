@@ -28,6 +28,15 @@ To click through the whole flow locally without sending anything:
 VITE_ENQUIRY_DEMO=true npm run dev
 ```
 
+To show the site to someone before it is deployed, build it as one file:
+
+```bash
+npm run build:preview   # dist-preview/protpure-preview.html, about 2 MB
+```
+
+The file opens by double-click in any browser and can be sent by email. It needs no server and makes no
+network requests: forms confirm without sending, and the documents hub, print and CSV download are left out.
+
 ## Where things live
 
 | Path | What it holds |
@@ -71,8 +80,8 @@ Where every number on the site comes from, and what is still waiting for the cli
 | Variable | Purpose |
 | --- | --- |
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID` | Backend (managed by Lovable Cloud, in `.env`) |
-| `VITE_ENQUIRY_DEMO=true` | Forms confirm without sending; the LinkedIn feed is not requested. For previews. |
-| `VITE_ROUTER=hash` | Hash-based URLs, for a static preview with no server-side routing |
+| `VITE_ENQUIRY_DEMO=true` | Forms confirm without sending; the LinkedIn feed is not requested. For local click-throughs |
+| `VITE_PREVIEW=true` | Set by `npm run build:preview`: in-memory routing, demo mode, no downloads, print or backend pages |
 
 ## Hosting
 

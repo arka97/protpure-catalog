@@ -1,4 +1,5 @@
 import type { GradeId, Product, SpecRow, Variant } from "@/types/catalog";
+import { EMPTY_COLUMNS } from "./hardware";
 import { PACKS } from "./packs";
 
 /*
@@ -817,8 +818,11 @@ export const VARIANTS = PRODUCTS.flatMap((product) => product.variants.map((vari
 
 export const variantById = (id: string) => VARIANTS.find((v) => v.variant.id === id);
 
-/** Total number of orderable catalogue items (resins, columns and kits). */
+/** Catalogue numbers of resins, pre-packed columns and kits (the client's product list). */
 export const SKU_COUNT = VARIANTS.reduce((n, v) => n + v.variant.packs.length, 0);
+
+/** Everything with a catalogue number: the items above and the empty columns. The figure the site states. */
+export const CATALOGUE_COUNT = SKU_COUNT + EMPTY_COLUMNS.length;
 
 /** Products the client asked to feature on the home page ("Feature Product_services" sheet). */
 export const FEATURED_SLUGS = [

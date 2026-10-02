@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { ArrowUpRight } from "lucide-react";
 import { SITE } from "@/data/site";
+import { DEMO } from "@/lib/env";
 import { QueryProvider } from "@/lib/query-client";
 
 interface FeedPost {
@@ -9,8 +10,6 @@ interface FeedPost {
   text: string;
   publishedAt: string;
 }
-
-const DEMO = import.meta.env.VITE_ENQUIRY_DEMO === "true";
 
 /**
  * Recent company posts from the `linkedin-company-feed` edge function.

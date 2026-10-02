@@ -203,11 +203,12 @@ export function Header() {
     <>
       {/*
         One banner landmark holds both bars. It sticks with a negative offset on wide screens, so the
-        utility bar scrolls away and only the main bar stays in view.
+        utility bar scrolls away and only the main bar stays in view (index.css brings the utility bar
+        back while keyboard focus is inside it).
       */}
-      <header className="no-print sticky top-0 z-40 md:-top-9">
+      <header className="site-header no-print sticky top-0 z-40 md:-top-9">
         {/* Utility bar */}
-        <div className="theme-ink hidden md:block">
+        <div className="site-utility theme-ink hidden md:block">
           <div className="shell flex h-9 items-center justify-between text-[0.8125rem]">
             <p className="flex items-center gap-3 text-on-ink-2">
               <Dots className="text-[0.7rem] text-signal" count={3} />

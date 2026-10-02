@@ -24,6 +24,7 @@ import { PHOTOS } from "@/data/photos";
 import { resourcesForProduct } from "@/data/resources";
 import { SITE } from "@/data/site";
 import { variantHeadline } from "@/lib/catalog-helpers";
+import { PREVIEW } from "@/lib/env";
 import { FAMILY_STYLE } from "@/lib/family-style";
 import { Sci, sciToText } from "@/lib/sci";
 import { useSeo } from "@/lib/seo";
@@ -46,7 +47,7 @@ function Block({ id, label, title, screenOnly, children }: BlockProps) {
     <section
       id={id}
       aria-labelledby={`${id}-title`}
-      className={cn("scroll-mt-28 border-t border-rule py-12 print:py-6 md:py-16", screenOnly && "no-print")}
+      className={cn("border-t border-rule py-12 print:py-6 md:py-16", screenOnly && "no-print")}
     >
       <div className="shell grid gap-x-12 gap-y-6 lg:grid-cols-12">
         <div className="lg:col-span-3">
@@ -215,10 +216,12 @@ function Detail({ product }: { product: Product }) {
               <Button size="lg" variant="outline" asChild>
                 <Link to={`/contact?about=${encodeURIComponent(product.name)}`}>Ask a scientist</Link>
               </Button>
-              <Button size="lg" variant="ghost" onClick={() => window.print()} className="hidden md:inline-flex">
-                <Printer aria-hidden />
-                Print
-              </Button>
+              {!PREVIEW && (
+                <Button size="lg" variant="ghost" onClick={() => window.print()} className="hidden md:inline-flex">
+                  <Printer aria-hidden />
+                  Print
+                </Button>
+              )}
             </div>
           </div>
 
@@ -420,7 +423,7 @@ function Detail({ product }: { product: Product }) {
                   <p className="mt-1.5 font-semibold">{d.title}</p>
                   <p className="mt-0.5 text-[0.9375rem] text-ink-2">{d.description}</p>
                 </div>
-                {d.file ? (
+                {!PREVIEW && d.file ? (
                   <Button size="sm" variant="outline" asChild>
                     <a href={d.file} download>
                       Download PDF

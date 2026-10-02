@@ -10,11 +10,12 @@ import { PageHeader } from "@/components/site/PageHeader";
 import { Em } from "@/components/site/Section";
 import { Button } from "@/components/ui/button";
 import { Halftone } from "@/components/viz/Halftone";
-import { PRODUCTS, SKU_COUNT } from "@/data/catalog";
+import { CATALOGUE_COUNT, PRODUCTS } from "@/data/catalog";
 import { FAMILIES, GRADES, STAGES, familyById } from "@/data/families";
 import { EMPTY_COLUMNS } from "@/data/hardware";
 import { downloadCatalogueCsv } from "@/lib/catalog-export";
 import { packToItem } from "@/lib/catalog-helpers";
+import { PREVIEW } from "@/lib/env";
 import { FAMILY_STYLE } from "@/lib/family-style";
 import { useSeo } from "@/lib/seo";
 import { cn } from "@/lib/utils";
@@ -115,7 +116,7 @@ export default function Products() {
     title: activeFamily ? `${activeFamily.title} | Products` : "Products: chromatography resins, columns and kits",
     description: activeFamily
       ? `${activeFamily.summary} ${activeFamily.principle}`
-      : `The ProtPure catalogue: ${PRODUCTS.length} product lines and ${SKU_COUNT + EMPTY_COLUMNS.length} catalogue items. Metal affinity, ion exchange, HIC, mixed-mode, metal removal and size exclusion resins, pre-packed columns, kits and empty columns.`,
+      : `The ProtPure catalogue: ${PRODUCTS.length} product lines and ${CATALOGUE_COUNT} catalogue items. Metal affinity, ion exchange, HIC, mixed-mode, metal removal and size exclusion resins, pre-packed columns, kits and empty columns.`,
   });
 
   return (
@@ -128,7 +129,7 @@ export default function Products() {
             Resins, columns and <Em>kits.</Em>
           </>
         }
-        lede={`${PRODUCTS.length} product lines and ${SKU_COUNT + EMPTY_COLUMNS.length} catalogue items, from 1 mL pre-packed columns to 1 L packs of resin. Add what you need to your quote list and send it in one request.`}
+        lede={`${PRODUCTS.length} product lines and ${CATALOGUE_COUNT} catalogue items, from 1 mL pre-packed columns to 1 L packs of resin. Add what you need to your quote list and send it in one request.`}
       />
 
       {/* Filters */}
@@ -265,7 +266,7 @@ export default function Products() {
                 Clear filters
               </button>
             )}
-            {view === "codes" && (
+            {!PREVIEW && view === "codes" && (
               <Button size="sm" variant="outline" onClick={downloadCatalogueCsv}>
                 <Download aria-hidden />
                 Full list (CSV)

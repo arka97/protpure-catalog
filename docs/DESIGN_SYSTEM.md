@@ -79,6 +79,7 @@ Rules:
 - Section rhythm: `py-20 md:py-28`; a 12-column grid with the headline on 7 columns and the lede on 5 (`SectionHeader`).
 - Inner pages start with `PageHeader` (breadcrumb, eyebrow, `h1`, lede, optional aside).
 - Detail pages use a margin column: label + heading on 3 columns, content on 9.
+- A section that is the target of a `#link` needs only an `id`: the offset for the sticky header is global.
 - Radii: `rounded-panel` (1.75 rem) for cards and panels, `rounded-lg` for small boxes, pills for buttons and chips.
 - Tables are hairline tables: a dark top rule, light row rules, no zebra.
 - Every page ends with `CTASection` (the coral band), except Contact and Quote.

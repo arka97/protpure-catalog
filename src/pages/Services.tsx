@@ -75,7 +75,7 @@ export default function Services() {
             key={s.slug}
             id={s.slug}
             aria-labelledby={`${s.slug}-title`}
-            className="scroll-mt-28 border-b border-rule py-14 md:py-20"
+            className="border-b border-rule py-14 md:py-20"
           >
             <div className="grid gap-x-12 gap-y-8 lg:grid-cols-12">
               <div className="lg:col-span-5">

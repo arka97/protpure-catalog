@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type ElementType, type ReactNode } from "react";
+import { PREVIEW } from "@/lib/env";
 import { cn } from "@/lib/utils";
 
 interface RevealProps {
@@ -15,7 +16,7 @@ interface RevealProps {
  */
 export function Reveal({ children, className, delay = 0, as: Tag = "div" }: RevealProps) {
   const ref = useRef<HTMLElement>(null);
-  const [shown, setShown] = useState(false);
+  const [shown, setShown] = useState(PREVIEW);
 
   useEffect(() => {
     const el = ref.current;

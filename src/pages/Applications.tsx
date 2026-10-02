@@ -32,7 +32,7 @@ export default function Applications() {
         lede={`${APPLICATIONS.length} application areas and ${WORKFLOWS} workflows, each mapped to ProtPure resins for capture, intermediate purification and polishing.`}
       />
 
-      <section id="finder" className="scroll-mt-28 py-14 md:py-20" aria-labelledby="finder-heading">
+      <section id="finder" className="py-14 md:py-20" aria-labelledby="finder-heading">
         <div className="shell">
           <h2 id="finder-heading" className="sr-only">
             Resin finder

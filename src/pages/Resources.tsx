@@ -6,10 +6,10 @@ import { PageHeader } from "@/components/site/PageHeader";
 import { Em, SectionHeader } from "@/components/site/Section";
 import { Button } from "@/components/ui/button";
 import { useRFQ } from "@/context/RFQContext";
-import { SKU_COUNT } from "@/data/catalog";
-import { EMPTY_COLUMNS } from "@/data/hardware";
+import { CATALOGUE_COUNT } from "@/data/catalog";
 import { GLOSSARY, RESOURCES, type ResourceType } from "@/data/resources";
 import { downloadCatalogueCsv } from "@/lib/catalog-export";
+import { PREVIEW } from "@/lib/env";
 import { useSeo } from "@/lib/seo";
 
 const TYPES: ResourceType[] = ["Datasheet", "Technical note", "Case study", "Brochure"];
@@ -82,7 +82,7 @@ export default function Resources() {
                             </p>
                           </div>
                         </div>
-                        {d.file ? (
+                        {!PREVIEW && d.file ? (
                           <Button size="sm" variant="outline" asChild>
                             <a href={d.file} download>
                               <Download aria-hidden />
@@ -114,15 +114,16 @@ export default function Resources() {
               Every catalogue number, in one <Em>file.</Em>
             </h2>
             <p className="lede mt-5 max-w-xl">
-              {SKU_COUNT + EMPTY_COLUMNS.length} catalogue numbers with product, grade and pack size, ready for your ERP
-              or vendor form.
+              {CATALOGUE_COUNT} catalogue numbers with product, grade and pack size, ready for your ERP or vendor form.
             </p>
           </div>
           <div className="flex flex-wrap gap-3 lg:col-span-5 lg:justify-end">
-            <Button size="lg" onClick={downloadCatalogueCsv}>
-              <Download aria-hidden />
-              Download CSV
-            </Button>
+            {!PREVIEW && (
+              <Button size="lg" onClick={downloadCatalogueCsv}>
+                <Download aria-hidden />
+                Download CSV
+              </Button>
+            )}
             <Button size="lg" variant="outline" asChild>
               <Link to="/products?view=codes">Browse the list</Link>
             </Button>

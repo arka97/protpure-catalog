@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { APPLICATIONS, applicationsForProduct } from "@/data/applications";
-import { FEATURED_SLUGS, PRODUCTS, productBySlug, SKU_COUNT, VARIANTS } from "@/data/catalog";
+import { CATALOGUE_COUNT, FEATURED_SLUGS, PRODUCTS, productBySlug, SKU_COUNT, VARIANTS } from "@/data/catalog";
 import { FAMILIES, GRADES, STAGES } from "@/data/families";
 import { EMPTY_COLUMNS } from "@/data/hardware";
 import { PACKS } from "@/data/packs";
@@ -19,6 +19,10 @@ describe("catalogue", () => {
 
   it("has the 64 empty columns of the accessories sheet", () => {
     expect(EMPTY_COLUMNS).toHaveLength(64);
+  });
+
+  it("states one total everywhere: 254 catalogue numbers", () => {
+    expect(CATALOGUE_COUNT).toBe(254);
   });
 
   it("never lists a catalogue number twice", () => {

@@ -7,7 +7,7 @@ interface AnchorLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 
 
 /**
  * Link to a section of the current page. It scrolls with JavaScript instead of changing the URL hash,
- * so it works the same under the browser router and under the hash router used for static previews.
+ * so it behaves the same on the live site and in a sandboxed preview.
  */
 export function AnchorLink({ target, onClick, children, ...props }: AnchorLinkProps) {
   return (

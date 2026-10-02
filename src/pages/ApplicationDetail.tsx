@@ -63,7 +63,7 @@ function Detail({ app }: { app: Application }) {
             key={sub.slug}
             id={sub.slug}
             aria-labelledby={`${sub.slug}-title`}
-            className="scroll-mt-28 border-b border-rule py-12 md:py-16"
+            className="border-b border-rule py-12 md:py-16"
           >
             <div className="grid gap-x-12 gap-y-6 lg:grid-cols-12">
               <div className="lg:col-span-4">

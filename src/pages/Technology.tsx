@@ -44,7 +44,7 @@ function Study({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-28 border-t border-rule py-12 md:py-16">
+    <section id={id} aria-labelledby={`${id}-title`} className="border-t border-rule py-12 md:py-16">
       <div className="grid gap-x-12 gap-y-8 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <p className="label text-signal-ink">{kicker}</p>
@@ -105,7 +105,7 @@ export default function Technology() {
       />
 
       {/* Platform */}
-      <section id="platform" className={cn(section, "scroll-mt-28")} aria-labelledby="platform-title">
+      <section id="platform" className={section} aria-labelledby="platform-title">
         <div className="shell">
           <SectionHeader
             index="01"
@@ -146,7 +146,7 @@ export default function Technology() {
       {/* Techniques */}
       <section
         id="techniques"
-        className={cn(section, "scroll-mt-28 border-y border-rule bg-paper-2")}
+        className={cn(section, "border-y border-rule bg-paper-2")}
         aria-labelledby="techniques-title"
       >
         <div className="shell">
@@ -199,7 +199,7 @@ export default function Technology() {
       </section>
 
       {/* Grades */}
-      <section id="grades" className={cn(section, "scroll-mt-28")} aria-labelledby="grades-title">
+      <section id="grades" className={section} aria-labelledby="grades-title">
         <div className="shell">
           <SectionHeader
             index="03"
@@ -218,7 +218,7 @@ export default function Technology() {
       </section>
 
       {/* Data */}
-      <section id="data" className="scroll-mt-28 border-t border-rule pt-20 md:pt-28" aria-labelledby="data-title">
+      <section id="data" className="border-t border-rule pt-20 md:pt-28" aria-labelledby="data-title">
         <div className="shell">
           <SectionHeader
             index="04"

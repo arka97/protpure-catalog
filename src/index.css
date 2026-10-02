@@ -162,7 +162,25 @@
 
   html {
     -webkit-text-size-adjust: 100%;
-    scroll-padding-top: 6.5rem;
+  }
+
+  /*
+    The header is sticky, so whatever is scrolled into view inside the page (a #section link, keyboard
+    focus) must stop below it. The offset is a scroll margin on the content, not scroll-padding on <html>:
+    scroll-padding also covers the header's own controls, and focusing one of them would move the page.
+  */
+  main,
+  main *,
+  footer * {
+    scroll-margin-top: 6.5rem;
+  }
+
+  /*
+    On wide screens the header sticks 2.25rem above the viewport and its utility bar scrolls away.
+    Keyboard focus inside that bar brings it back.
+  */
+  .site-header:has(.site-utility :focus-visible) {
+    top: 0;
   }
 
   body {

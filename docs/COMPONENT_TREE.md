@@ -34,7 +34,7 @@ Declared in `src/App.tsx`. Every page except the home page is loaded lazily.
 
 ```
 Toaster (sonner)
-BrowserRouter            (HashRouter when VITE_ROUTER=hash)
+BrowserRouter            (MemoryRouter in the preview build)
 └── RFQProvider
     └── CompareProvider
         └── <Routes>
@@ -134,6 +134,10 @@ graph LR
 
 - One `<h1>` per page; landmarks: `header`, `main`, `footer`, labelled `nav`s.
 - Overlays opened from several places use `lib/use-focus-return.ts`, so focus returns to the opener
-  (or to `<main>` after a link inside the overlay was followed).
+  (or to `<main>` after a link inside the overlay was followed) without moving the page.
+- The header is sticky. Content inside `<main>` and `<footer>` carries a scroll margin (`index.css`), so
+  `#section` links and keyboard focus stop below it. Do not use `scroll-padding` on `<html>` for this:
+  it makes the header's own controls scroll the page when they receive focus.
+- On wide screens the utility bar scrolls away; keyboard focus inside it brings it back.
 - Same-page links use `AnchorLink` (works under both routers and respects reduced motion).
 - Animations stop under `prefers-reduced-motion`; the hero shows a still frame.

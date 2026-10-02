@@ -1,4 +1,5 @@
 import { SITE } from "@/data/site";
+import { DEMO } from "./env";
 
 /*
   The enquiry (RFQ) pipeline, client side.
@@ -118,9 +119,6 @@ export function enquirySubject(contact: Partial<Contact>, items: RFQItem[]) {
 }
 
 export type SubmitResult = { ok: true; demo?: boolean } | { ok: false; reason: "network" | "rejected" };
-
-/** Preview builds set VITE_ENQUIRY_DEMO=true so the flow can be shown without sending anything. */
-const DEMO = import.meta.env.VITE_ENQUIRY_DEMO === "true";
 
 /**
  * Sends an enquiry to the sales inbox. With items it uses the `rfq-submission` template,

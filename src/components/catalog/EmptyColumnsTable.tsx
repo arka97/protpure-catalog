@@ -126,7 +126,7 @@ export function EmptyColumnsTable({ className }: { className?: string }) {
       <div
         tabIndex={0}
         role="region"
-        aria-label="Empty chromatography columns"
+        aria-label="Empty columns table"
         className="relative mt-3 overflow-x-auto"
       >
         <table className="w-full min-w-[44rem] border-collapse text-left">
