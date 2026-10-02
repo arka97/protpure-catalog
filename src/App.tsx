@@ -29,7 +29,6 @@ const Router = PREVIEW ? MemoryRouter : BrowserRouter;
 const Backend = PREVIEW
   ? null
   : {
-      Unsubscribe: lazy(() => import("@/pages/Unsubscribe")),
       DocsLayout: lazy(() => import("@/pages/docs/DocsLayout")),
       DocsHub: lazy(() => import("@/pages/docs/DocumentsHub")),
       DocPage: lazy(() => import("@/pages/docs/DocPage")),
@@ -54,7 +53,6 @@ const App = () => (
               <Route path="/resources" element={<Resources />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/quote" element={<Quote />} />
-              {Backend && <Route path="/unsubscribe" element={<Backend.Unsubscribe />} />}
               {/* Addresses from the previous site */}
               <Route path="/procurement" element={<Navigate to="/about" replace />} />
               <Route path="/company" element={<Navigate to="/about" replace />} />

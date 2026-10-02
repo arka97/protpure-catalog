@@ -5,7 +5,7 @@ import { DEMO } from "./env";
   The enquiry (RFQ) pipeline, client side.
 
   Every enquiry on the site ends here: the quote list, the service form and the contact form all call
-  `submitEnquiry`, which posts to the existing `send-transactional-email` edge function. The payload shapes
+  `submitEnquiry`, which posts to the `submit-rfq` or `submit-contact` edge function. The payload shapes
   are the ones the deployed `rfq-submission` and `contact-submission` email templates already expect, so
   no backend change is needed.
 */
@@ -131,43 +131,36 @@ export async function submitEnquiry(contact: Contact, items: RFQItem[]): Promise
     return { ok: true, demo: true };
   }
 
-  const id = crypto.randomUUID();
+  const requestId = crypto.randomUUID();
+  const fn = items.length ? "submit-rfq" : "submit-contact";
   const body = items.length
     ? {
-        templateName: "rfq-submission",
-        idempotencyKey: `rfq-${id}`,
-        replyTo: contact.email,
-        templateData: {
-          name: contact.name,
-          company: contact.company,
-          email: contact.email,
-          phone: contact.phone,
-          country: contact.country,
-          requirements: contact.message,
-          items: items.map((item) => ({
-            productName: `${KIND_LABEL[item.kind]}${item.name}`,
-            packSize: item.pack,
-            catNo: item.catNo,
-            quantity: item.quantity,
-            notes: item.notes,
-          })),
-        },
+        requestId,
+        name: contact.name,
+        company: contact.company,
+        email: contact.email,
+        phone: contact.phone,
+        country: contact.country,
+        requirements: contact.message,
+        items: items.map((item) => ({
+          productName: `${KIND_LABEL[item.kind]}${item.name}`,
+          packSize: item.pack,
+          catNo: item.catNo,
+          quantity: item.quantity,
+          notes: item.notes,
+        })),
       }
     : {
-        templateName: "contact-submission",
-        idempotencyKey: `contact-${id}`,
-        replyTo: contact.email,
-        templateData: {
-          name: contact.name,
-          company: contact.company,
-          email: contact.email,
-          message: enquiryToText({ message: contact.message, phone: contact.phone, country: contact.country }, []),
-        },
+        requestId,
+        name: contact.name,
+        company: contact.company,
+        email: contact.email,
+        message: enquiryToText({ message: contact.message, phone: contact.phone, country: contact.country }, []),
       };
 
   try {
     const { supabase } = await import("@/integrations/supabase/client");
-    const { data, error } = await supabase.functions.invoke("send-transactional-email", { body });
+    const { data, error } = await supabase.functions.invoke(fn, { body });
     if (error) return { ok: false, reason: "rejected" };
     if (data && typeof data === "object" && "success" in data && data.success === false) {
       return { ok: false, reason: "rejected" };
