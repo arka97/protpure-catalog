@@ -1,4 +1,4 @@
-import type { EmptyColumn } from "@/types/catalog";
+import type { EmptyColumn } from "../types/catalog";
 
 /*
   Empty protein chromatography columns (accessories).

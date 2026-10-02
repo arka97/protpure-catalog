@@ -1,4 +1,4 @@
-import type { FamilyId, GradeId, StageId } from "@/types/catalog";
+import type { FamilyId, GradeId, StageId } from "../types/catalog";
 
 /*
   Application → resin matrix.

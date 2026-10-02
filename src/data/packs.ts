@@ -1,4 +1,4 @@
-import type { Pack } from "@/types/catalog";
+import type { Pack } from "../types/catalog";
 
 /*
   Catalogue numbers and pack sizes, one entry per orderable item.
