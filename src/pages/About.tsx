@@ -1,321 +1,293 @@
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { PageHero } from "@/components/layout/PageHero";
-import { CTABand } from "@/components/home/CTABand";
-import { Button } from "@/components/ui/button";
-import { useRFQ } from "@/context/RFQContext";
+import { ArrowUpRight } from "lucide-react";
+import { CTASection } from "@/components/site/CTASection";
+import { PageHeader } from "@/components/site/PageHeader";
+import { Photo } from "@/components/site/Photo";
+import { Reveal } from "@/components/site/Reveal";
+import { Em, Eyebrow, SectionHeader } from "@/components/site/Section";
 import {
-  Building2,
-  Target,
-  Beaker,
-  ShieldCheck,
-  Globe2,
-  TrendingUp,
-  FileText,
-  Truck,
-  BadgeIndianRupee,
-  Clock,
-  CheckCircle2,
-  ArrowRight,
-} from "lucide-react";
+  CAPABILITIES,
+  EVALUATION_STEPS,
+  FACILITY_FACTS,
+  FOUNDER,
+  INDUSTRIES,
+  MILESTONES,
+  MISSION,
+  VISION,
+  WHY_PROTPURE,
+} from "@/data/company";
+import { PHOTOS } from "@/data/photos";
+import { MAPS_URL, SITE } from "@/data/site";
+import { useSeo } from "@/lib/seo";
 
-const facility = [
-  ["Location", "Anand, Gujarat, India"],
-  ["Facility area", "5,000 sq ft dedicated manufacturing"],
-  ["Production capacity", "600 L resin / month"],
-  ["Reactor scale", "20 L, 50 L, 200 L cross-linking reactors"],
-  ["QC capability", "Particle sizing, ionic capacity, DBC, HETP"],
-  ["Standard delivery", "2–3 weeks ex-works"],
-  ["Product range", "20+ resins · 5 mL R&D to 100 L industrial"],
-];
-
-const vision = [
-  {
-    icon: Globe2,
-    title: "Reduce import dependency",
-    desc: "Indigenous manufacturing of critical biopharma inputs, with domestic supply assurance.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Reproducible quality",
-    desc: "Batch-to-batch consistency through tightly controlled bead synthesis and ligand coupling.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Scale with the customer",
-    desc: "From 5 mL R&D screening to 100 L commercial — same chemistry, same column behaviour.",
-  },
-  {
-    icon: Beaker,
-    title: "Application support",
-    desc: "Hands-on technical support for method development, scale-up, and troubleshooting.",
-  },
-];
-
-const capabilities = [
-  {
-    icon: Building2,
-    title: "Registered Indian Entity",
-    desc: "Protpure Tech Pvt. Ltd. — incorporated under MCA. GSTIN, PAN, and TAN documentation available on request.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Quality & Compliance",
-    desc: "Batch-tested chromatography resins. CoA issued per lot. Ionic capacity, DBC, particle size, and column efficiency validated before release.",
-  },
-  {
-    icon: Truck,
-    title: "Delivery Commitments",
-    desc: "Standard delivery: 2–3 weeks ex-works Anand, Gujarat. Domestic courier and freight forwarding for bulk orders.",
-  },
-  {
-    icon: BadgeIndianRupee,
-    title: "INR Invoicing & GST",
-    desc: "All transactions in Indian Rupees. GST-compliant invoicing. No foreign exchange exposure or import duties.",
-  },
-  {
-    icon: FileText,
-    title: "Technical Documentation",
-    desc: "Product datasheets, CoA, MSDS, and storage/handling guidelines provided with every shipment. Custom documentation on request.",
-  },
-  {
-    icon: Clock,
-    title: "Evaluation & Onboarding",
-    desc: "Free 5–25 mL evaluation samples for qualified labs. Fast-track vendor qualification with direct India-entity documentation.",
-  },
-];
-
-const vendorDocs = [
-  "Certificate of Incorporation",
-  "GST Registration Certificate",
-  "PAN Card",
-  "Product Technical Datasheets",
-  "Certificate of Analysis (per lot)",
-  "MSDS / SDS for all products",
-  "Bank details for payment setup",
-  "Authorized signatory declaration",
-];
+const section = "py-20 md:py-28";
 
 export default function About() {
-  const { setOpen } = useRFQ();
+  useSeo({
+    title: "Company: an Indian chromatography resin manufacturer",
+    description:
+      "Protpure Tech Pvt. Ltd. develops and manufactures agarose chromatography media in Anand, Gujarat. Established in 2023, founder-led, with 600 L of monthly resin capacity.",
+  });
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1">
-        <PageHero
-          eyebrow="About"
-          title="Indigenous chromatography resins, manufactured in Anand"
-          description="ProtPure Tech Pvt. Ltd. designs and manufactures agarose-based chromatography resins for the Indian and global biopharmaceutical industry."
-          breadcrumbs={[{ label: "Home", to: "/" }, { label: "About" }]}
-        />
+    <>
+      <PageHeader
+        crumbs={[{ label: "Company" }]}
+        eyebrow="Company"
+        title={
+          <>
+            Building India’s chromatography resin <Em>platform.</Em>
+          </>
+        }
+        lede="Protpure Tech Pvt. Ltd. develops and manufactures agarose chromatography media in Anand, Gujarat, for biotechnology, diagnostics, vaccine and research organisations."
+        aside={
+          <Photo
+            photo={PHOTOS.labFplcColumn}
+            priority
+            sizes="(min-width: 1024px) 38vw, 100vw"
+            className="[&>div]:aspect-[5/4]"
+          />
+        }
+      />
 
-        <section className="bg-white py-20">
-          <div className="max-w-[1280px] mx-auto px-6 md:px-10 grid md:grid-cols-[1fr_1.2fr] gap-12 items-start">
-            <div>
-              <div className="text-[11px] font-semibold tracking-[0.15em] text-teal uppercase mb-3">
-                Story
-              </div>
-              <h2 className="font-serif text-3xl text-navy mb-5">Built for Indian biopharma</h2>
-              <div className="space-y-4 text-[15px] text-slate leading-relaxed">
-                <p>
-                  ProtPure was founded to close a gap that Indian biopharma has lived with for
-                  decades — reliance on imported chromatography media for downstream processing
-                  of recombinant proteins, vaccines, and biologics.
-                </p>
-                <p>
-                  Our 6% cross-linked agarose platform was developed in-house and validated against
-                  benchmark imported resins on column efficiency (As = 1.63, h = 1.04), dynamic
-                  binding capacity, and chemical stability at standard CIP conditions.
-                </p>
-                <p>
-                  Customers include process development teams at Indian biopharma companies running
-                  insulin, monoclonal antibody, and recombinant therapeutic programs from R&D
-                  through GMP commercial manufacturing.
-                </p>
-              </div>
-            </div>
+      {/* Founder */}
+      <section className={section} aria-label="From the founder">
+        <div className="shell grid gap-x-12 gap-y-10 lg:grid-cols-12">
+          <Eyebrow index="01" className="self-start lg:col-span-3 lg:pt-4">
+            From the founder
+          </Eyebrow>
+          <figure className="lg:col-span-9">
+            <blockquote className="text-[clamp(1.625rem,3.2vw,2.75rem)] font-medium leading-[1.16] tracking-tight">
+              “{FOUNDER.quote}”
+            </blockquote>
+            <figcaption className="mt-7 flex items-center gap-4">
+              <span aria-hidden className="h-px w-10 bg-ink" />
+              <span>
+                <span className="block font-semibold">{FOUNDER.name}</span>
+                <span className="block text-[0.9375rem] text-ink-2">
+                  {FOUNDER.role}, {SITE.legalName}
+                </span>
+              </span>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
 
-            <div className="bg-secondary/40 rounded-xl border border-border overflow-hidden">
-              <div className="px-6 py-4 border-b border-border bg-white flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-teal" />
-                <h3 className="text-sm font-semibold text-navy">Facility snapshot</h3>
-              </div>
-              <table className="w-full">
-                <tbody>
-                  {facility.map(([k, v]) => (
-                    <tr key={k} className="border-b border-border last:border-0">
-                      <td className="px-6 py-3.5 text-[13px] text-slate w-2/5">{k}</td>
-                      <td className="px-6 py-3.5 text-[13px] text-navy font-medium">{v}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+      {/* Vision and mission */}
+      <section className="border-y border-rule bg-paper-2" aria-label="Vision and mission">
+        <div className="shell grid md:grid-cols-2">
+          <div className="border-rule py-12 md:border-r md:py-16 md:pr-12">
+            <h2 className="label text-ink-3">Vision</h2>
+            <p className="mt-4 text-[clamp(1.25rem,1.9vw,1.625rem)] font-medium leading-snug tracking-tight">
+              {VISION}
+            </p>
           </div>
-        </section>
-
-        <section className="bg-background py-20">
-          <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-            <div className="grid md:grid-cols-[1fr_1.5fr] gap-10 items-center bg-white rounded-2xl border border-border p-8 md:p-10">
-              <div className="bg-navy hex-pattern rounded-xl p-8 text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,hsl(var(--teal)/0.25),transparent_60%)]" />
-                <div className="relative">
-                  <div className="w-20 h-20 rounded-full bg-teal/20 border-2 border-teal-bright/40 mx-auto flex items-center justify-center mb-4">
-                    <Target className="w-9 h-9 text-teal-bright" />
-                  </div>
-                  <div className="font-serif text-xl text-white mb-1">Dr. Rucha Desai</div>
-                  <div className="text-[11px] tracking-[0.1em] uppercase text-teal-bright font-semibold mb-2">
-                    Founder &amp; CEO
-                  </div>
-                  <div className="text-sm text-on-navy-muted">
-                    Polymer chemistry · 20+ yrs in bioseparations
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div className="text-[11px] font-semibold tracking-[0.15em] text-teal uppercase mb-3">
-                  Founder
-                </div>
-                <h3 className="font-serif text-2xl text-navy mb-4">A scientist-led company</h3>
-                <p className="text-[15px] text-slate leading-relaxed mb-3">
-                  ProtPure was founded by Dr. Rucha Desai, a chemist with two decades of
-                  experience in bead polymerisation, ligand coupling, and downstream process
-                  development for the biopharma industry.
-                </p>
-                <p className="text-[15px] text-slate leading-relaxed">
-                  Every product in the catalog is developed, characterised, and supported by
-                  scientists — not resold. We talk to your process team in their language.
-                </p>
-              </div>
-            </div>
+          <div className="border-t border-rule py-12 md:border-t-0 md:py-16 md:pl-12">
+            <h2 className="label text-ink-3">Mission</h2>
+            <p className="mt-4 text-[clamp(1.25rem,1.9vw,1.625rem)] font-medium leading-snug tracking-tight">
+              {MISSION}
+            </p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="bg-white py-20">
-          <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-            <div className="mb-12 max-w-2xl">
-              <div className="text-[11px] font-semibold tracking-[0.15em] text-teal uppercase mb-3">
-                Vision
-              </div>
-              <h2 className="font-serif text-3xl text-navy mb-3">What we're building toward</h2>
-              <p className="text-base text-slate leading-relaxed">
-                Self-reliant Indian biomanufacturing built on locally produced, scientifically
-                rigorous chromatography media.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {vision.map((v) => (
+      {/* Facts and milestones */}
+      <section className={section} aria-labelledby="facts-title">
+        <div className="shell">
+          <SectionHeader
+            index="02"
+            eyebrow="At a glance"
+            title={
+              <span id="facts-title">
+                Founder-led, bootstrapped, and <Em>shipping.</Em>
+              </span>
+            }
+            lede="A large share of the chromatography media used in India is imported. We are building the local alternative: reliable supply, technical support close at hand, and manufacturing that can scale."
+          />
+          <div className="mt-12 grid gap-x-12 gap-y-12 lg:mt-16 lg:grid-cols-12">
+            <dl className="border-t border-ink lg:col-span-7">
+              {FACILITY_FACTS.map((f) => (
                 <div
-                  key={v.title}
-                  className="bg-white border border-border rounded-xl p-6 hover:border-teal-pale hover:shadow-[0_4px_16px_rgba(0,0,0,0.04)] transition-all"
+                  key={f.label}
+                  className="grid grid-cols-[7.5rem_1fr] gap-4 border-b border-rule py-4 sm:grid-cols-[10rem_1fr]"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-teal-pale flex items-center justify-center mb-4">
-                    <v.icon className="w-5 h-5 text-teal" />
-                  </div>
-                  <h3 className="font-semibold text-navy text-[15px] mb-2">{v.title}</h3>
-                  <p className="text-[13px] text-slate leading-relaxed">{v.desc}</p>
+                  <dt className="label pt-1 text-ink-3">{f.label}</dt>
+                  <dd className="text-lg font-medium leading-snug tracking-tight">{f.value}</dd>
                 </div>
               ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Procurement & vendor qualification (merged from /procurement) */}
-        <section className="bg-background py-20">
-          <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-            <div className="mb-12 max-w-2xl">
-              <div className="text-[11px] font-semibold tracking-[0.15em] text-teal uppercase mb-3">
-                Procurement
-              </div>
-              <h2 className="font-serif text-3xl md:text-4xl text-navy mb-3">
-                Vendor qualification &amp; onboarding
-              </h2>
-              <p className="text-base text-slate leading-relaxed">
-                Built to meet the vendor qualification requirements of Indian pharma companies,
-                CDMOs, and research institutions.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
-              {capabilities.map((c) => (
-                <div
-                  key={c.title}
-                  className="bg-white border border-border rounded-xl p-7 hover:border-teal-pale transition-colors"
-                >
-                  <div className="w-10 h-10 rounded-lg bg-teal-pale flex items-center justify-center mb-4">
-                    <c.icon className="w-5 h-5 text-teal" />
-                  </div>
-                  <h3 className="text-[15px] font-semibold text-navy mb-2">{c.title}</h3>
-                  <p className="text-[13px] text-slate leading-relaxed">{c.desc}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-10 items-start bg-white rounded-2xl border border-border p-8">
-              <div>
-                <div className="text-[11px] font-semibold tracking-[0.15em] text-teal uppercase mb-3">
-                  Documentation
-                </div>
-                <h3 className="font-serif text-2xl text-navy mb-4">
-                  Vendor qualification documents
-                </h3>
-                <p className="text-[14px] text-slate leading-relaxed mb-5">
-                  Available on request to support your vendor onboarding. Reach our team with
-                  your specific compliance requirements and we'll send the complete pack.
-                </p>
-                <Button
-                  onClick={() => setOpen(true)}
-                  className="bg-teal hover:bg-teal-light text-white"
-                >
-                  Request vendor pack <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              </div>
-              <ul className="space-y-3">
-                {vendorDocs.map((d) => (
-                  <li key={d} className="flex items-start gap-3">
-                    <CheckCircle2 className="w-4 h-4 text-teal mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-slate">{d}</span>
-                  </li>
+            </dl>
+            <div className="lg:col-span-5">
+              <h3 className="label border-b border-ink pb-4 text-ink-3">Milestones</h3>
+              <ol>
+                {MILESTONES.map((m, i) => (
+                  <Reveal as="li" key={m} className="grid grid-cols-[2.5rem_1fr] gap-3 border-b border-rule py-4">
+                    <span className="label pt-1 text-signal-ink">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="font-medium leading-snug">{m}</span>
+                  </Reveal>
                 ))}
-              </ul>
+              </ol>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="bg-navy hex-pattern py-20">
-          <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-            <div className="mb-10 max-w-2xl">
-              <div className="text-[11px] font-semibold tracking-[0.15em] text-teal-bright uppercase mb-3">
-                Capacity
-              </div>
-              <h2 className="font-serif text-3xl text-white mb-3">
-                Manufacturing capacity statement
-              </h2>
-              <p className="text-base text-on-navy leading-relaxed">
-                Current production data for procurement planning and supply assurance.
+      {/* Capabilities */}
+      <section className={`${section} theme-ink`} aria-labelledby="capabilities-title">
+        <div className="shell">
+          <SectionHeader
+            index="03"
+            eyebrow="Capabilities"
+            title={
+              <span id="capabilities-title">
+                From the bead to the packed <Em>column.</Em>
+              </span>
+            }
+            lede="Media development, purification evaluation and customer deployment sit under one roof."
+          />
+          <div className="mt-12 grid gap-x-12 gap-y-10 lg:mt-16 lg:grid-cols-12">
+            <div className="grid grid-cols-2 gap-4 self-start lg:col-span-6">
+              <Photo photo={PHOTOS.labFplc} sizes="(min-width: 1024px) 46vw, 100vw" className="col-span-2" />
+              <Photo photo={PHOTOS.bpg200} sizes="(min-width: 1024px) 23vw, 50vw" className="[&>div]:aspect-square" />
+              <Photo
+                photo={PHOTOS.columnsFan}
+                sizes="(min-width: 1024px) 23vw, 50vw"
+                className="[&>div]:aspect-square"
+              />
+              <p className="col-span-2 text-[0.8125rem] text-ink-3">
+                Applications laboratory · Ni-NTA Agarose in a process column at a customer site · 1 mL pre-packed
+                columns
               </p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {[
-                { val: "600 L", label: "Monthly resin production capacity" },
-                { val: "20+", label: "Products in catalogue across 5 chromatography types" },
-                { val: "5 mL–100 L", label: "Pack size range — R&D to commercial" },
-                { val: "2–3 weeks", label: "Standard delivery ex-works Anand" },
-              ].map((s) => (
-                <div
-                  key={s.label}
-                  className="bg-white/[0.05] border border-white/10 rounded-xl p-6"
+            <ol className="lg:col-span-6">
+              {CAPABILITIES.map((c, i) => (
+                <li
+                  key={c.title}
+                  className="grid grid-cols-[3rem_1fr] gap-x-4 border-t border-rule py-6 first:border-foreground"
                 >
-                  <div className="font-serif text-2xl text-white mb-2">{s.val}</div>
-                  <div className="text-[12px] text-on-navy leading-snug">{s.label}</div>
-                </div>
+                  <span className="label pt-1.5 text-ink-3">{String(i + 1).padStart(2, "0")}</span>
+                  <div>
+                    <h3 className="text-xl font-semibold tracking-tight">{c.title}</h3>
+                    <p className="mt-2 text-ink-2">{c.text}</p>
+                  </div>
+                </li>
               ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      {/* Why ProtPure */}
+      <section className={section} aria-labelledby="why-title">
+        <div className="shell">
+          <SectionHeader
+            index="04"
+            eyebrow="Why ProtPure"
+            title={
+              <span id="why-title">
+                Four reasons to qualify a second <Em>source.</Em>
+              </span>
+            }
+          />
+          <ul className="mt-12 grid gap-px overflow-hidden rounded-panel border border-rule bg-rule sm:grid-cols-2 lg:mt-16 lg:grid-cols-4">
+            {WHY_PROTPURE.map((w, i) => (
+              <li key={w.title} className="bg-card p-6 sm:p-7">
+                <p className="label text-signal-ink">{String(i + 1).padStart(2, "0")}</p>
+                <h3 className="mt-10 text-xl font-semibold leading-tight tracking-tight">{w.title}</h3>
+                <p className="mt-2 text-[0.9375rem] text-ink-2">{w.text}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {/* Evaluation */}
+      <section className={`${section} border-y border-rule bg-paper-2`} aria-labelledby="evaluation-title">
+        <div className="shell">
+          <SectionHeader
+            index="05"
+            eyebrow="Working with us"
+            title={
+              <span id="evaluation-title">
+                Low-risk technical evolution, not supplier <Em>replacement.</Em>
+              </span>
+            }
+            lede="You do not have to change your process to find out whether our resin works in it. This is the evaluation approach we recommend."
+          />
+          <ol className="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:mt-16 lg:grid-cols-4">
+            {EVALUATION_STEPS.map((s, i) => (
+              <Reveal as="li" key={s.title} delay={i * 70} className="border-t border-ink pt-5">
+                <p className="numeral text-[2.5rem] text-ink-3">{i + 1}</p>
+                <h3 className="mt-4 text-xl font-semibold leading-tight tracking-tight">{s.title}</h3>
+                <p className="mt-2 text-[0.9375rem] text-ink-2">{s.text}</p>
+              </Reveal>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Industries and location */}
+      <section className={section} aria-labelledby="industries-title">
+        <div className="shell grid gap-x-12 gap-y-14 lg:grid-cols-12">
+          <div className="lg:col-span-7">
+            <Eyebrow index="06" className="mb-5">
+              Industries
+            </Eyebrow>
+            <h2 id="industries-title" className="display-3">
+              Industries we <Em>serve.</Em>
+            </h2>
+            <ul className="mt-10 grid gap-x-8 sm:grid-cols-2">
+              {INDUSTRIES.map((ind) => (
+                <li key={ind.name} className="border-t border-rule py-5">
+                  <p className="text-lg font-semibold tracking-tight">{ind.name}</p>
+                  <p className="mt-1 text-[0.9375rem] text-ink-2">{ind.items.join(" · ")}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="lg:col-span-5 lg:pl-6">
+            <div className="rounded-panel border border-rule bg-card p-6 sm:p-8">
+              <p className="label text-ink-3">Where we are</p>
+              <address className="mt-4 text-lg font-medium not-italic leading-snug tracking-tight">
+                {SITE.legalName}
+                {SITE.address.lines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
+                ))}
+              </address>
+              <dl className="mt-6 space-y-2 border-t border-rule pt-5 text-[0.9375rem]">
+                <div className="flex gap-3">
+                  <dt className="label w-14 pt-1 text-ink-3">Email</dt>
+                  <dd>
+                    <a href={`mailto:${SITE.email}`} className="font-medium underline underline-offset-4">
+                      {SITE.email}
+                    </a>
+                  </dd>
+                </div>
+                <div className="flex gap-3">
+                  <dt className="label w-14 pt-1 text-ink-3">Phone</dt>
+                  <dd>
+                    <a href={SITE.phoneHref} className="font-medium underline underline-offset-4">
+                      {SITE.phone}
+                    </a>
+                  </dd>
+                </div>
+              </dl>
+              <a
+                href={MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold hover:underline"
+              >
+                Open in Google Maps
+                <ArrowUpRight aria-hidden className="h-4 w-4" />
+                <span className="sr-only">(opens in a new tab)</span>
+              </a>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <CTABand />
-      </main>
-      <Footer />
-    </div>
+      <CTASection title="Let’s build India’s biotechnology future together." />
+    </>
   );
 }

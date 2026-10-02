@@ -1,20 +1,23 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
-import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { SITE } from "@/data/site";
+import { useSeo } from "@/lib/seo";
 
 type State = "loading" | "valid" | "already" | "invalid" | "submitting" | "done" | "error";
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
 
+/** Email preference page reached from the unsubscribe link in ProtPure emails. */
 export default function Unsubscribe() {
   const [params] = useSearchParams();
   const token = params.get("token");
   const [state, setState] = useState<State>("loading");
+
+  useSeo({ title: "Email preferences", description: "Unsubscribe from ProtPure emails.", noindex: true });
 
   useEffect(() => {
     if (!token) {
@@ -25,7 +28,9 @@ export default function Unsubscribe() {
       try {
         const res = await fetch(
           `${SUPABASE_URL}/functions/v1/handle-email-unsubscribe?token=${encodeURIComponent(token)}`,
-          { headers: { apikey: SUPABASE_KEY } },
+          {
+            headers: { apikey: SUPABASE_KEY },
+          },
         );
         const data = await res.json().catch(() => ({}));
         if (data?.valid) setState("valid");
@@ -41,83 +46,84 @@ export default function Unsubscribe() {
     if (!token) return;
     setState("submitting");
     try {
-      const { data, error } = await supabase.functions.invoke("handle-email-unsubscribe", {
-        body: { token },
-      });
+      const { data, error } = await supabase.functions.invoke<{ success?: boolean; reason?: string }>(
+        "handle-email-unsubscribe",
+        {
+          body: { token },
+        },
+      );
       if (error) throw error;
-      if ((data as any)?.success) setState("done");
-      else if ((data as any)?.reason === "already_unsubscribed") setState("already");
+      if (data?.success) setState("done");
+      else if (data?.reason === "already_unsubscribed") setState("already");
       else setState("error");
     } catch {
       setState("error");
     }
   };
 
+  const busy = state === "loading" || state === "submitting";
+
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 flex items-center justify-center bg-secondary/30 py-20 px-6">
-        <div className="max-w-md w-full bg-white border border-border rounded-xl p-8 text-center">
-          <h1 className="font-serif text-2xl text-navy mb-3">Email preferences</h1>
+    <section className="shell flex min-h-[60vh] items-center justify-center py-20">
+      <div
+        className="w-full max-w-md rounded-panel border border-rule bg-card p-8 text-center sm:p-10"
+        aria-live="polite"
+      >
+        <p className="label text-ink-3">Email preferences</p>
+        <h1 className="heading-4 mt-3">
+          {state === "done" || state === "already" ? "You are unsubscribed" : "Unsubscribe from ProtPure emails"}
+        </h1>
 
-          {state === "loading" && (
-            <div className="flex flex-col items-center gap-3 text-slate">
-              <Loader2 className="w-6 h-6 animate-spin text-teal" />
-              <p className="text-sm">Validating your link…</p>
-            </div>
-          )}
+        {busy && (
+          <p className="mt-6 flex items-center justify-center gap-2 text-ink-2">
+            <Loader2 aria-hidden className="h-5 w-5 animate-spin" />
+            {state === "loading" ? "Checking your link" : "Updating your preferences"}
+          </p>
+        )}
 
-          {state === "valid" && (
-            <>
-              <p className="text-sm text-slate mb-6">
-                Click below to unsubscribe from ProtPure emails.
-              </p>
-              <Button onClick={confirm} className="bg-teal hover:bg-teal-light text-white w-full">
-                Confirm unsubscribe
-              </Button>
-            </>
-          )}
+        {state === "valid" && (
+          <>
+            <p className="mt-4 text-ink-2">Confirm below and we will stop sending emails to this address.</p>
+            <Button onClick={confirm} size="lg" className="mt-6 w-full">
+              Confirm unsubscribe
+            </Button>
+          </>
+        )}
 
-          {state === "submitting" && (
-            <div className="flex flex-col items-center gap-3 text-slate">
-              <Loader2 className="w-6 h-6 animate-spin text-teal" />
-              <p className="text-sm">Processing…</p>
-            </div>
-          )}
+        {state === "done" && (
+          <p className="mt-6 flex flex-col items-center gap-3 text-ink-2">
+            <CheckCircle2 aria-hidden className="h-9 w-9 text-sec" />
+            This address will no longer receive emails from us.
+          </p>
+        )}
 
-          {state === "done" && (
-            <div className="flex flex-col items-center gap-3">
-              <CheckCircle2 className="w-10 h-10 text-teal" />
-              <p className="text-sm text-slate">You've been unsubscribed. We're sorry to see you go.</p>
-            </div>
-          )}
+        {state === "already" && (
+          <p className="mt-6 flex flex-col items-center gap-3 text-ink-2">
+            <CheckCircle2 aria-hidden className="h-9 w-9 text-sec" />
+            This address was already unsubscribed.
+          </p>
+        )}
 
-          {state === "already" && (
-            <div className="flex flex-col items-center gap-3">
-              <CheckCircle2 className="w-10 h-10 text-teal" />
-              <p className="text-sm text-slate">This address is already unsubscribed.</p>
-            </div>
-          )}
+        {state === "invalid" && (
+          <p className="mt-6 flex flex-col items-center gap-3 text-ink-2">
+            <AlertCircle aria-hidden className="h-9 w-9 text-destructive" />
+            This unsubscribe link is invalid or has expired.
+          </p>
+        )}
 
-          {state === "invalid" && (
-            <div className="flex flex-col items-center gap-3">
-              <AlertCircle className="w-10 h-10 text-destructive" />
-              <p className="text-sm text-slate">This unsubscribe link is invalid or expired.</p>
-            </div>
-          )}
-
-          {state === "error" && (
-            <div className="flex flex-col items-center gap-3">
-              <AlertCircle className="w-10 h-10 text-destructive" />
-              <p className="text-sm text-slate">
-                Something went wrong. Please try again later or email{" "}
-                <a className="text-teal" href="mailto:info@protpure.com">info@protpure.com</a>.
-              </p>
-            </div>
-          )}
-        </div>
-      </main>
-      <Footer />
-    </div>
+        {state === "error" && (
+          <p className="mt-6 flex flex-col items-center gap-3 text-ink-2">
+            <AlertCircle aria-hidden className="h-9 w-9 text-destructive" />
+            <span>
+              Something went wrong. Try again later, or email{" "}
+              <a className="font-medium text-foreground underline underline-offset-4" href={`mailto:${SITE.email}`}>
+                {SITE.email}
+              </a>
+              .
+            </span>
+          </p>
+        )}
+      </div>
+    </section>
   );
 }

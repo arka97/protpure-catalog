@@ -45,7 +45,9 @@ export default function DocPage() {
         arr.push(doc.slug);
         localStorage.setItem(READ_KEY, JSON.stringify(arr));
       }
-    } catch {}
+    } catch {
+      /* the read marker is optional: ignore storage errors */
+    }
   }, [doc]);
 
   const toc = useMemo(() => (doc ? extractToc(doc.body) : []), [doc]);
@@ -93,10 +95,8 @@ export default function DocPage() {
       <div className="max-w-6xl mx-auto px-6 md:px-10 py-10 grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-10">
         <article>
           <div className="mb-8">
-            <span className="font-mono text-xs text-muted-foreground tracking-wider">
-              {doc.number}
-            </span>
-            <h1 className="font-serif text-3xl md:text-4xl mt-2 mb-3">{doc.title}</h1>
+            <span className="font-mono text-xs text-muted-foreground tracking-wider">{doc.number}</span>
+            <h1 className="display-3 mt-2 mb-3">{doc.title}</h1>
             <p className="text-muted-foreground">{doc.summary}</p>
           </div>
           <MarkdownRenderer source={doc.body} />
@@ -105,9 +105,7 @@ export default function DocPage() {
         {toc.length > 0 && (
           <aside className="hidden lg:block">
             <div className="sticky top-20">
-              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">
-                On this page
-              </div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-3">On this page</div>
               <ul className="space-y-2 text-sm border-l border-border">
                 {toc.map((item, i) => (
                   <li key={i} style={{ paddingLeft: item.level === 3 ? 20 : 12 }}>

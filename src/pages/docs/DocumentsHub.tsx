@@ -15,7 +15,9 @@ function useReadSet() {
     try {
       const raw = localStorage.getItem(READ_KEY);
       if (raw) setRead(new Set(JSON.parse(raw)));
-    } catch {}
+    } catch {
+      /* the read markers are optional: ignore storage errors */
+    }
   }, []);
   return read;
 }
@@ -27,19 +29,19 @@ function DocCard({ doc, isRead }: { doc: DocMeta; isRead: boolean }) {
       className="group rounded-2xl border border-border bg-card p-6 hover:border-primary/40 hover:bg-card/80 transition-colors flex flex-col"
     >
       <div className="flex items-center justify-between mb-3">
-        <span className="font-mono text-xs text-muted-foreground tracking-wider">
-          {doc.number}
-        </span>
+        <span className="font-mono text-xs text-muted-foreground tracking-wider">{doc.number}</span>
         {isRead && (
           <span className="flex items-center gap-1 text-[10px] uppercase tracking-wider text-primary">
             <CheckCircle2 className="w-3 h-3" /> read
           </span>
         )}
       </div>
-      <h3 className="font-serif text-lg text-foreground mb-2">{doc.title}</h3>
+      <h3 className="text-lg font-semibold tracking-tight text-foreground mb-2">{doc.title}</h3>
       <p className="text-sm text-muted-foreground leading-relaxed flex-1">{doc.summary}</p>
       <div className="flex items-center justify-between mt-5 pt-4 border-t border-border text-xs text-muted-foreground">
-        <span>{doc.read_time} · {doc.diagram_count} diagram{doc.diagram_count === 1 ? "" : "s"}</span>
+        <span>
+          {doc.read_time} · {doc.diagram_count} diagram{doc.diagram_count === 1 ? "" : "s"}
+        </span>
         <span className="flex items-center gap-1 text-foreground group-hover:text-primary transition-colors">
           Open <ChevronRight className="w-3 h-3" />
         </span>
@@ -93,13 +95,18 @@ export default function DocumentsHub() {
               <ArrowLeft className="w-3 h-3" /> Home
             </Link>
             <div className="flex items-center gap-3">
-              <h1 className="font-serif text-3xl md:text-4xl">Documentation</h1>
+              <h1 className="display-3">Documentation</h1>
               <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded border border-border text-muted-foreground">
                 v1.0
               </span>
             </div>
           </div>
-          <Button onClick={downloadAll} variant="outline" size="sm" disabled={zipping || isLoading || docs.length === 0}>
+          <Button
+            onClick={downloadAll}
+            variant="outline"
+            size="sm"
+            disabled={zipping || isLoading || docs.length === 0}
+          >
             {zipping ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
             Download all (.zip)
           </Button>
