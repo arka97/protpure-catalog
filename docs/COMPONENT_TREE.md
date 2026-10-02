@@ -2,7 +2,7 @@
 title: Component Tree
 description: Routing, provider stack, global state, and component hierarchy
 phase: production
-last_updated: 2026-10-02
+last_updated: 2026-10-03
 owner: Protpure engineering
 ---
 
@@ -23,7 +23,7 @@ Declared in `src/App.tsx`. Every page except the home page is loaded lazily.
 | `/technology` | `Technology` | `#platform`, `#techniques`, `#grades`, `#data`, `#sec` |
 | `/about` | `About` | Company page (path kept from the previous site) |
 | `/resources` | `Resources` | Documents on request, catalogue CSV, glossary |
-| `/contact` | `Contact` | `?about=` pre-fills the message; live LinkedIn posts when available |
+| `/contact` | `Contact` | `?about=` pre-fills the message; the LinkedIn posts listed in `src/data/linkedin-posts.ts`, if any |
 | `/quote` | `Quote` | The quote list as a full page (`noindex`) |
 | `/unsubscribe` | `Unsubscribe` | Email preference link target (`noindex`) |
 | `/procurement`, `/company` | Redirect → `/about` | Addresses from the previous site |
@@ -50,7 +50,7 @@ BrowserRouter            (MemoryRouter in the preview build)
             └── DocsLayout                 /documents…
 ```
 
-`QueryProvider` (TanStack Query) wraps only the two consumers of remote reads: `DocsLayout` and `LinkedInFeed`.
+`QueryProvider` (TanStack Query) wraps only the one consumer of remote reads: `DocsLayout`.
 `DocAuthProvider` is scoped to `/documents/*` so its session token cannot leak into unrelated pages.
 
 ## Global state
@@ -60,7 +60,7 @@ BrowserRouter            (MemoryRouter in the preview build)
 | `RFQContext` | app-wide | Quote list (localStorage `protpure_quote_list_v2`), drawer open state, contact draft (memory only) |
 | `CompareContext` | app-wide | Up to three product slugs (sessionStorage `protpure_compare_v2`), dialog state |
 | `DocAuthContext` | `/documents/*` only | JWT + expiry in `sessionStorage` |
-| `QueryClient` (`lib/query-client.tsx`) | docs hub, LinkedIn feed | Cached reads from edge functions |
+| `QueryClient` (`lib/query-client.tsx`) | docs hub | Cached reads from edge functions |
 | URL search params | `/products` | Filters, search text, view |
 
 ## The enquiry pipeline
@@ -122,8 +122,7 @@ graph LR
     Contact --> Form
     Form --> Enquiry[lib/enquiry.ts]
     Contact --> LI[LinkedInFeed]
-    LI --> QC[(QueryProvider)]
-    Docs --> QC
+    Docs --> QC[(QueryProvider)]
     Docs --> DA((DocAuthContext))
     DA --> Hub[DocumentsHub]
     DA --> Page[DocPage]

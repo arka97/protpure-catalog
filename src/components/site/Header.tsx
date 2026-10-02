@@ -239,7 +239,12 @@ export function Header() {
               <Logo className="h-8 lg:h-9" />
             </Link>
 
-            <nav aria-label="Main" className="hidden h-full lg:block">
+            {/*
+              Logo, seven items and the two buttons need about 1,070 px, so the full menu starts at xl and
+              narrower windows get the menu button. The search field spells itself out from 1340 px, where
+              there is room for it beside the menu.
+            */}
+            <nav aria-label="Main" className="hidden h-full xl:block">
               <ul className="flex h-full items-stretch">
                 {NAV.map((item) =>
                   item.menu ? (
@@ -305,12 +310,14 @@ export function Header() {
                   searchFocus.remember();
                   setSearchOpen(true);
                 }}
-                className="flex h-10 items-center gap-2 rounded-full px-3 text-sm text-ink-2 transition-colors hover:bg-paper-2 hover:text-foreground xl:border xl:border-rule xl:pl-3.5 xl:pr-2"
+                className="flex h-10 items-center gap-2 rounded-full px-3 text-sm text-ink-2 transition-colors hover:bg-paper-2 hover:text-foreground min-[1340px]:border min-[1340px]:border-rule min-[1340px]:pl-3.5 min-[1340px]:pr-2"
                 aria-label="Search products, catalogue numbers and applications"
               >
                 <Search aria-hidden className="h-[1.125rem] w-[1.125rem]" />
-                <span className="hidden xl:inline">Search</span>
-                <kbd className="label hidden rounded bg-paper-2 px-1.5 py-0.5 text-ink-3 xl:inline">Ctrl K</kbd>
+                <span className="hidden min-[1340px]:inline">Search</span>
+                <kbd className="label hidden rounded bg-paper-2 px-1.5 py-0.5 text-ink-3 min-[1340px]:inline">
+                  Ctrl K
+                </kbd>
               </button>
 
               <Button
@@ -337,7 +344,7 @@ export function Header() {
                   menuFocus.remember();
                   setMobileOpen(true);
                 }}
-                className="grid h-10 w-10 place-items-center rounded-full text-foreground hover:bg-paper-2 lg:hidden"
+                className="grid h-10 w-10 place-items-center rounded-full text-foreground hover:bg-paper-2 xl:hidden"
                 aria-label="Open menu"
               >
                 <Menu aria-hidden className="h-5 w-5" />
@@ -387,15 +394,6 @@ export function Header() {
                   )}
                 </li>
               ))}
-              <li className="border-b border-rule">
-                <Link
-                  to="/contact"
-                  className="flex items-center justify-between py-4 text-2xl font-semibold tracking-tight"
-                >
-                  Contact
-                  <ArrowRight aria-hidden className="h-5 w-5 text-ink-3" />
-                </Link>
-              </li>
             </ul>
           </nav>
           <div className="space-y-3 border-t border-rule bg-paper-2 px-5 py-5">

@@ -66,7 +66,7 @@ Rules for any agent (human or AI) editing this codebase. These are not suggestio
 | --- | --- | --- |
 | 1 | Password-gated docs hub instead of full user auth | Small partner audience; a shared password + short-lived JWT is enough and avoids account management |
 | 2 | pgmq + pg_cron for transactional email | Keeps everything inside Lovable Cloud, retries survive worker restarts, no external queue vendor |
-| 3 | LinkedIn feed shows live posts only | The earlier "curated fallback" was invented placeholder news. The function now returns no posts when LinkedIn is unreachable and the Contact page hides the block (2026-10) |
+| 3 | LinkedIn posts are real posts, entered by hand | The earlier "curated fallback" was invented placeholder news and was removed. A live feed is not possible: the Lovable LinkedIn connection covers a personal profile, and LinkedIn gives a company page's posts only to developer apps it has approved. Posts the company published are copied into `src/data/linkedin-posts.ts`; with none listed the Contact page hides the block. The site no longer calls `linkedin-company-feed` (2026-10) |
 | 4 | RFQ email idempotency via `idempotency_key` | Prevents double-sends from React StrictMode + retries |
 | 5 | Catalogue is typed data in `src/data`, not Postgres | The `products` table was never read by the live site and held the 2025 range. 19 product lines change a few times a year; typed modules with tests are cheaper to keep correct than an unmaintained admin path. The table is left in place, unused (2026-10) |
 | 6 | No dark mode toggle exposed | Brand is a single warm-light theme; `.dark` shares the `theme-ink` token mapping used for dark sections |
@@ -105,7 +105,7 @@ mindmap
       Catalogue in src/data, tested
       Sourced claims only
       Docs in Postgres Markdown
-      LinkedIn feed: live posts only
+      LinkedIn: real posts, entered by hand
       SEO metadata on every page
     Do-not-touch
       supabase/client.ts

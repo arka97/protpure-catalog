@@ -2,7 +2,7 @@
 title: API Spec
 description: Edge functions, payloads, auth, and external integrations
 phase: production
-last_updated: 2026-10-02
+last_updated: 2026-10-03
 owner: Protpure engineering
 ---
 
@@ -21,7 +21,7 @@ All backend endpoints are Supabase Edge Functions (Deno). Invocation from the cl
 | `preview-transactional-email` | false | Render a template to HTML for preview |
 | `handle-email-unsubscribe` | false | Redeem an unsubscribe token → add to suppression list |
 | `handle-email-suppression` | false | Resend webhook: record bounces/complaints |
-| `linkedin-company-feed` | false | Server-side fetch of company posts with fallback |
+| `linkedin-company-feed` | false | Not called by the site since 2026-10; to be deleted in Lovable (see below) |
 
 ### `verify-doc-password`
 
@@ -89,14 +89,14 @@ Template data sent by the site:
 - **Method**: `POST` (open)
 - **Response**: `{ source: "live" | "fallback", posts: Post[] }` with `Post = { id, url, text, publishedAt, thumbnailUrl? }`
 - **Flow**: Attempts the LinkedIn API through the Lovable connector gateway (`LOVABLE_API_KEY`, `LINKEDIN_API_KEY`). If that fails it returns `source: "fallback"` with an **empty** list. 30-minute in-memory cache.
-- **Client**: `LinkedInFeed` renders posts only when `source === "live"`; otherwise the Contact page shows the profile link alone.
+- **Status**: it always returns the empty list. The Lovable LinkedIn connection covers a personal profile and cannot read a company page's posts. The site stopped calling it in 2026-10: `LinkedInFeed` now shows the posts listed in `src/data/linkedin-posts.ts`. The function is still deployed and should be deleted through Lovable, which also removes its entry in `supabase/config.toml`.
 
 ## External integrations
 
 | Integration | Consumer | Notes |
 | --- | --- | --- |
 | Resend | `process-email-queue`, `handle-email-suppression` | Deliverable transport + webhook events |
-| LinkedIn API | `linkedin-company-feed` | Via Lovable connector; no posts are shown when it is unavailable |
+| LinkedIn API | `linkedin-company-feed` (unused) | The connector cannot read company posts; the site shows hand-entered posts instead |
 | Lovable AI Gateway | reserved (`LOVABLE_API_KEY` present) | Not currently invoked in production |
 
 ## Authenticated request flow (RFQ submission)

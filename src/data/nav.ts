@@ -14,4 +14,5 @@ export const NAV: NavItem[] = [
   { label: "Technology", to: "/technology" },
   { label: "Company", to: "/about" },
   { label: "Resources", to: "/resources" },
+  { label: "Contact", to: "/contact" },
 ];

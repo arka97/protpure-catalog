@@ -58,11 +58,6 @@ export function Footer() {
                 </li>
               ))}
               <li>
-                <Link to="/contact" className={linkClass}>
-                  Contact
-                </Link>
-              </li>
-              <li>
                 <Link to="/quote" className={linkClass}>
                   Request a quote
                 </Link>
