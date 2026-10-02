@@ -115,16 +115,15 @@ describe("submitEnquiry", () => {
     await expect(submitEnquiry(contact, [resin, service])).resolves.toEqual({ ok: true });
 
     const [fn, { body }] = invoke.mock.calls[0];
-    expect(fn).toBe("send-transactional-email");
-    expect(body.templateName).toBe("rfq-submission");
-    expect(body.replyTo).toBe("asha@example.com");
-    expect(body.idempotencyKey).toMatch(/^rfq-/);
-    expect(body.templateData).toMatchObject({
+    expect(fn).toBe("submit-rfq");
+    expect(body.email).toBe("asha@example.com");
+    expect(body.requestId).toBeTruthy();
+    expect(body).toMatchObject({
       name: "Asha Rao",
       company: "Example Biologics",
       requirements: "Needed by March.",
     });
-    expect(body.templateData.items).toEqual([
+    expect(body.items).toEqual([
       { productName: "Q Agarose High Resolution", packSize: "25 mL", catNo: "QAHR01", quantity: 2, notes: "" },
       {
         productName: "Service: Resin screening and selection",
@@ -139,10 +138,10 @@ describe("submitEnquiry", () => {
   it("sends a general enquiry with the contact-submission template", async () => {
     invoke.mockResolvedValue({ data: { success: true }, error: null });
     await submitEnquiry(contact, []);
-    const { body } = invoke.mock.calls[0][1];
-    expect(body.templateName).toBe("contact-submission");
-    expect(body.templateData.message).toContain("Needed by March.");
-    expect(body.templateData.message).toContain("Phone: +91 98765 43210");
+    const [fn, { body }] = invoke.mock.calls[0];
+    expect(fn).toBe("submit-contact");
+    expect(body.message).toContain("Needed by March.");
+    expect(body.message).toContain("Phone: +91 98765 43210");
   });
 
   it("reports a failure instead of pretending the request was sent", async () => {
