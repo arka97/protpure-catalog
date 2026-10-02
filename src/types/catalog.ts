@@ -1,3 +1,4 @@
+/** Shared catalogue model for product, application, and packaging data. */
 export type FamilyId = "imac" | "iex" | "hic" | "mixed" | "mrc" | "sec" | "columns" | "kits" | "hardware";
 export type GradeId = "ff" | "precise" | "hr";
 export type StageId = "capture" | "intermediate" | "polishing";
