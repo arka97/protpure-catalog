@@ -16,43 +16,9 @@ type FeedPost = {
 
 let cache: { at: number; payload: { source: "live" | "fallback"; posts: FeedPost[] } } | null = null;
 
-const FALLBACK_POSTS: FeedPost[] = [
-  {
-    id: "fb-1",
-    url: LINKEDIN_URL,
-    text: "Q Agarose Faster now shipping in 100 L industrial pack. Strong anion exchange optimised for capture at 700 cm/hr. CoA-released, 2-week lead time ex-works Anand.",
-    publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 4).toISOString(),
-    tag: "Launch",
-  },
-  {
-    id: "fb-2",
-    url: LINKEDIN_URL,
-    text: "mAb polishing on CM Agarose — case study. Aggregate clearance >99% with single-step elution. Method transferable from 1 mL screening to 50 L preparative.",
-    publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 11).toISOString(),
-    tag: "Application note",
-  },
-  {
-    id: "fb-3",
-    url: LINKEDIN_URL,
-    text: "600 L/month resin production capacity online. Three cross-linking reactors (20, 50, 200 L) running on staggered schedule for continuous supply assurance.",
-    publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 19).toISOString(),
-    tag: "Facility",
-  },
-  {
-    id: "fb-4",
-    url: LINKEDIN_URL,
-    text: "Protein A MabSelect alternative now in pilot — dynamic binding capacity >50 g/L at 4 min residence time. Sampling open for qualified mAb developers.",
-    publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 27).toISOString(),
-    tag: "Pilot",
-  },
-  {
-    id: "fb-5",
-    url: LINKEDIN_URL,
-    text: "ProtPure at BioProcess India 2026 — visit Booth 14 to discuss scale-up from screening to GMP supply with our applications team.",
-    publishedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 35).toISOString(),
-    tag: "Event",
-  },
-];
+// When LinkedIn cannot be reached the function returns no posts, and the site links to the company
+// profile instead. Invented placeholder posts must never be shown as company news.
+const FALLBACK_POSTS: FeedPost[] = [];
 
 function fallback(): { source: "fallback"; posts: FeedPost[] } {
   return { source: "fallback", posts: FALLBACK_POSTS };

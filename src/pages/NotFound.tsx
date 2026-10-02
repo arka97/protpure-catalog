@@ -1,24 +1,38 @@
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Em } from "@/components/site/Section";
+import { useSeo } from "@/lib/seo";
 
-const NotFound = () => {
-  const location = useLocation();
+const LINKS = [
+  { to: "/products", label: "Products" },
+  { to: "/applications", label: "Applications" },
+  { to: "/services", label: "Services" },
+  { to: "/technology", label: "Technology" },
+  { to: "/contact", label: "Contact" },
+];
 
-  useEffect(() => {
-    console.error("404 Error: User attempted to access non-existent route:", location.pathname);
-  }, [location.pathname]);
+export default function NotFound() {
+  useSeo({ title: "Page not found", description: "This page does not exist on protpure.com.", noindex: true });
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-muted">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">404</h1>
-        <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
-        <a href="/" className="text-primary underline hover:text-primary/90">
-          Return to Home
-        </a>
+    <section className="shell py-24 md:py-36">
+      <p className="label text-ink-3">Error 404</p>
+      <h1 className="display-2 mt-5 max-w-[16ch]">
+        Nothing eluted at this <Em>address.</Em>
+      </h1>
+      <p className="lede mt-6 max-w-xl">
+        The page may have moved when the site was rebuilt. These will get you back on track.
+      </p>
+      <div className="mt-9 flex flex-wrap gap-3">
+        <Button size="lg" asChild>
+          <Link to="/">Go to the home page</Link>
+        </Button>
+        {LINKS.map((l) => (
+          <Button key={l.to} size="lg" variant="outline" asChild>
+            <Link to={l.to}>{l.label}</Link>
+          </Button>
+        ))}
       </div>
-    </div>
+    </section>
   );
-};
-
-export default NotFound;
+}

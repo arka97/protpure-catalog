@@ -42,12 +42,12 @@ function Mermaid({ chart }: { chart: string }) {
 
 export function MarkdownRenderer({ source }: { source: string }) {
   return (
-    <div className="prose prose-slate dark:prose-invert max-w-none prose-headings:font-serif prose-headings:scroll-mt-24 prose-a:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border">
+    <div className="prose prose-slate max-w-none prose-headings:font-sans prose-headings:tracking-tight prose-headings:scroll-mt-24 prose-a:text-primary prose-pre:bg-muted prose-pre:border prose-pre:border-border">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         rehypePlugins={[rehypeSlug, [rehypeAutolinkHeadings, { behavior: "wrap" }]]}
         components={{
-          code(props: any) {
+          code(props: React.ComponentPropsWithoutRef<"code"> & { inline?: boolean }) {
             const { className, children, inline, ...rest } = props;
             const match = /language-(\w+)/.exec(className || "");
             const lang = match?.[1];

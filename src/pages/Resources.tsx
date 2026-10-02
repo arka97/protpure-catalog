@@ -1,123 +1,167 @@
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { PageHero } from "@/components/layout/PageHero";
+import { Link } from "react-router-dom";
+import { Download, FileText } from "lucide-react";
+import { AddToQuote } from "@/components/catalog/AddToQuote";
+import { CTASection } from "@/components/site/CTASection";
+import { PageHeader } from "@/components/site/PageHeader";
+import { Em, SectionHeader } from "@/components/site/Section";
 import { Button } from "@/components/ui/button";
-import { Download, FileText, Presentation, BookOpen, BarChart3, Sparkles } from "lucide-react";
-import { toast } from "sonner";
+import { useRFQ } from "@/context/RFQContext";
+import { CATALOGUE_COUNT } from "@/data/catalog";
+import { GLOSSARY, RESOURCES, type ResourceType } from "@/data/resources";
+import { downloadCatalogueCsv } from "@/lib/catalog-export";
+import { PREVIEW } from "@/lib/env";
+import { useSeo } from "@/lib/seo";
 
-type Doc = {
-  title: string;
-  type: string;
-  desc: string;
-  size: string;
-  icon: typeof FileText;
+const TYPES: ResourceType[] = ["Datasheet", "Technical note", "Case study", "Brochure"];
+const PLURAL: Record<ResourceType, string> = {
+  Datasheet: "Datasheets",
+  "Technical note": "Technical notes",
+  "Case study": "Case studies",
+  Brochure: "Brochures",
 };
 
-const docs: Doc[] = [
-  {
-    title: "ProtPure Product Brochure",
-    type: "Brochure",
-    desc: "Full-line catalog overview — product families, particle variants, pack sizes, and contact details.",
-    size: "PDF · 2.4 MB",
-    icon: BookOpen,
-  },
-  {
-    title: "Q Agarose Technical Datasheet",
-    type: "Datasheet",
-    desc: "Specifications, DBC curves, flow-pressure data, and CIP recommendations for Q Agarose & Faster.",
-    size: "PDF · 680 KB",
-    icon: FileText,
-  },
-  {
-    title: "Ni-NTA Agarose Technical Datasheet",
-    type: "Datasheet",
-    desc: "His-tag binding capacity, regeneration protocol, and recommended buffer conditions.",
-    size: "PDF · 720 KB",
-    icon: FileText,
-  },
-  {
-    title: "Flow Velocity & Bead-Size Guide",
-    type: "Application guide",
-    desc: "How to pick between Standard, Faster, Precise, and HR variants for capture, intermediate, and polishing steps.",
-    size: "PDF · 1.1 MB",
-    icon: BarChart3,
-  },
-  {
-    title: "Indigenous Chromatography Resins",
-    type: "Scientific presentation",
-    desc: "Conference deck on the ProtPure agarose platform, column efficiency benchmarks, and Indian biopharma case studies.",
-    size: "PDF · 4.2 MB",
-    icon: Presentation,
-  },
-];
-
 export default function Resources() {
-  const handleDownload = (title: string) => {
-    toast.success(`${title} — request received`, {
-      description: "We'll email the document within 24 hours.",
-    });
+  const { addItem, setOpen } = useRFQ();
+
+  useSeo({
+    title: "Resources: datasheets, technical notes and glossary",
+    description:
+      "ProtPure technical datasheets, performance data, case studies and brochures, the full list of catalogue numbers, and a short chromatography glossary.",
+  });
+
+  const requestAll = () => {
+    RESOURCES.forEach((r) =>
+      addItem({ id: `doc-${r.id}`, kind: "document", name: r.title, href: "/resources" }, { quiet: true }),
+    );
+    setOpen(true);
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1">
-        <PageHero
-          eyebrow="Resources"
-          title="Datasheets, application guides, and technical references"
-          description="Everything you need to evaluate, qualify, and scale ProtPure resins in your downstream process."
-          breadcrumbs={[{ label: "Home", to: "/" }, { label: "Resources" }]}
-        />
+    <>
+      <PageHeader
+        crumbs={[{ label: "Resources" }]}
+        eyebrow="Resources"
+        title={
+          <>
+            Datasheets, data and <Em>definitions.</Em>
+          </>
+        }
+        lede="Technical documents are sent by email on request, so you always receive the current revision. Add the ones you need to your list and send it with your details."
+        actions={
+          <Button size="lg" variant="signal" onClick={requestAll}>
+            Request all {RESOURCES.length} documents
+          </Button>
+        }
+      />
 
-        <section className="bg-background py-20">
-          <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {docs.map((d) => (
-                <article
-                  key={d.title}
-                  className="bg-white border border-border rounded-xl p-6 flex flex-col hover:border-teal-pale hover:shadow-[0_8px_24px_-12px_hsl(var(--teal)/0.18)] hover:-translate-y-0.5 transition-all"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-11 h-11 rounded-lg bg-teal-pale flex items-center justify-center">
-                      <d.icon className="w-5 h-5 text-teal" />
-                    </div>
-                    <span className="text-[10px] font-semibold tracking-wider uppercase text-slate-light bg-secondary px-2 py-1 rounded">
-                      {d.type}
-                    </span>
-                  </div>
-                  <h3 className="font-serif text-lg text-navy leading-tight mb-2">{d.title}</h3>
-                  <p className="text-[13px] text-slate leading-relaxed mb-5 flex-1">{d.desc}</p>
-                  <div className="flex items-center justify-between pt-4 border-t border-border">
-                    <span className="text-[11px] text-slate-light font-mono">{d.size}</span>
-                    <Button
-                      size="sm"
-                      onClick={() => handleDownload(d.title)}
-                      className="bg-teal hover:bg-teal-light text-white gap-1.5 h-8"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      Download
-                    </Button>
-                  </div>
-                </article>
-              ))}
-
-              <article className="border-2 border-dashed border-border rounded-xl p-6 flex flex-col items-center justify-center text-center bg-white/40">
-                <div className="w-11 h-11 rounded-lg bg-secondary flex items-center justify-center mb-4">
-                  <Sparkles className="w-5 h-5 text-slate-light" />
+      <section className="py-16 md:py-24" aria-labelledby="documents-title">
+        <div className="shell">
+          <h2 id="documents-title" className="sr-only">
+            Documents
+          </h2>
+          <div className="space-y-14">
+            {TYPES.map((type) => {
+              const docs = RESOURCES.filter((r) => r.type === type);
+              if (!docs.length) return null;
+              return (
+                <div key={type} className="grid gap-x-12 gap-y-5 lg:grid-cols-12">
+                  <h3 className="heading-4 lg:col-span-3">{PLURAL[type]}</h3>
+                  <ul className="border-t border-ink lg:col-span-9">
+                    {docs.map((d) => (
+                      <li
+                        key={d.id}
+                        className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-rule py-5"
+                      >
+                        <div className="flex min-w-0 gap-4">
+                          <FileText aria-hidden className="mt-1 hidden h-5 w-5 shrink-0 text-ink-3 sm:block" />
+                          <div className="min-w-0">
+                            <p className="text-lg font-semibold leading-snug tracking-tight">{d.title}</p>
+                            <p className="mt-1 max-w-2xl text-[0.9375rem] text-ink-2">{d.description}</p>
+                            <p className="label mt-2.5 text-ink-3">
+                              {d.issued} · {d.pages} {d.pages === 1 ? "page" : "pages"} · PDF
+                            </p>
+                          </div>
+                        </div>
+                        {!PREVIEW && d.file ? (
+                          <Button size="sm" variant="outline" asChild>
+                            <a href={d.file} download>
+                              <Download aria-hidden />
+                              Download
+                            </a>
+                          </Button>
+                        ) : (
+                          <AddToQuote
+                            item={{ id: `doc-${d.id}`, kind: "document", name: d.title, href: "/resources" }}
+                            label="Request"
+                            variant="outline"
+                          />
+                        )}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <h3 className="font-serif text-lg text-navy mb-2">Application Notes</h3>
-                <p className="text-[13px] text-slate leading-relaxed mb-3">
-                  Insulin capture, mAb polishing, and IMAC scale-up notes — in preparation.
-                </p>
-                <span className="text-[11px] font-mono uppercase tracking-wider text-teal font-semibold">
-                  Coming soon
-                </span>
-              </article>
-            </div>
+              );
+            })}
           </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
+        </div>
+      </section>
+
+      <section className="border-y border-rule bg-paper-2 py-16 md:py-20" aria-labelledby="codes-title">
+        <div className="shell grid gap-x-12 gap-y-8 lg:grid-cols-12 lg:items-center">
+          <div className="lg:col-span-7">
+            <p className="label text-ink-3">For purchasing teams</p>
+            <h2 id="codes-title" className="display-3 mt-4">
+              Every catalogue number, in one <Em>file.</Em>
+            </h2>
+            <p className="lede mt-5 max-w-xl">
+              {CATALOGUE_COUNT} catalogue numbers with product, grade and pack size, ready for your ERP or vendor form.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3 lg:col-span-5 lg:justify-end">
+            {!PREVIEW && (
+              <Button size="lg" onClick={downloadCatalogueCsv}>
+                <Download aria-hidden />
+                Download CSV
+              </Button>
+            )}
+            <Button size="lg" variant="outline" asChild>
+              <Link to="/products?view=codes">Browse the list</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 md:py-28" aria-labelledby="glossary-title">
+        <div className="shell">
+          <SectionHeader
+            eyebrow="Glossary"
+            title={
+              <span id="glossary-title">
+                The terms on our <Em>datasheets.</Em>
+              </span>
+            }
+            lede={
+              <>
+                Short definitions of the measurements used across this site. For the numbers themselves, see{" "}
+                <Link to="/technology#data" className="font-medium text-foreground underline underline-offset-4">
+                  performance data
+                </Link>
+                .
+              </>
+            }
+          />
+          <dl className="mt-12 grid gap-x-12 md:grid-cols-2">
+            {GLOSSARY.map((g) => (
+              <div key={g.term} className="border-t border-rule py-6">
+                <dt className="text-lg font-semibold tracking-tight">{g.term}</dt>
+                <dd className="mt-2 text-ink-2">{g.definition}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+
+      <CTASection />
+    </>
   );
 }

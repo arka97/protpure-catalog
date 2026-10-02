@@ -1,302 +1,152 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { PageHero } from "@/components/layout/PageHero";
+import { useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowUpRight, Linkedin, Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { EnquiryForm } from "@/components/rfq/EnquiryForm";
+import { LinkedInFeed } from "@/components/site/LinkedInFeed";
+import { PageHeader } from "@/components/site/PageHeader";
+import { Em } from "@/components/site/Section";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin, Linkedin, MessageCircle, ExternalLink } from "lucide-react";
-import { z } from "zod";
-import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { Skeleton } from "@/components/ui/skeleton";
+import { useRFQ } from "@/context/RFQContext";
+import { MAPS_URL, SITE, whatsappUrl } from "@/data/site";
+import { useSeo } from "@/lib/seo";
 
-const schema = z.object({
-  name: z.string().trim().min(1, "Name required").max(100),
-  company: z.string().trim().max(120).optional(),
-  email: z.string().trim().email("Valid email required").max(255),
-  message: z.string().trim().min(1, "Message required").max(2000),
-});
-
-const ADDRESS = "Plot A2/440/2, Road B-18, GIDC, Vitthal Udyog Nagar, Anand 388121, Gujarat, India";
-const MAPS_EMBED = `https://www.google.com/maps?q=${encodeURIComponent(ADDRESS)}&output=embed`;
-const LINKEDIN_URL = "https://www.linkedin.com/company/protpure-tech-pvt-ltd/";
-
-const contactCards = [
-  {
-    icon: Mail,
-    label: "Email",
-    value: "info@protpure.com",
-    href: "mailto:info@protpure.com",
-    hint: "We respond within 24–48 hours",
-  },
-  {
-    icon: Phone,
-    label: "Phone",
-    value: "+91 94265 96644",
-    href: "tel:+919426596644",
-    hint: "Mon–Sat · 10:00–18:00 IST",
-  },
-  {
-    icon: MessageCircle,
-    label: "WhatsApp",
-    value: "+91 94265 96644",
-    href: "https://wa.me/919426596644?text=Hi%20ProtPure%2C%20I%27d%20like%20to%20enquire%20about...",
-    hint: "Quickest channel for technical questions",
-    external: true,
-  },
-  {
-    icon: Linkedin,
-    label: "LinkedIn",
-    value: "@protpure-tech-pvt-ltd",
-    href: LINKEDIN_URL,
-    hint: "Follow product launches and updates",
-    external: true,
-  },
-];
+const NO_ITEMS: never[] = [];
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: "", company: "", email: "", message: "" });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [params] = useSearchParams();
+  const about = params.get("about");
+  const { count, setOpen, contact, setContact } = useRFQ();
 
-  type FeedPost = {
-    id: string;
-    url: string;
-    text: string;
-    publishedAt: string;
-    thumbnailUrl?: string;
-    tag?: string;
-  };
-
-  const { data: feed, isLoading: feedLoading } = useQuery({
-    queryKey: ["linkedin-company-feed"],
-    queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke<{ source: string; posts: FeedPost[] }>(
-        "linkedin-company-feed",
-      );
-      if (error) throw error;
-      return data;
-    },
-    staleTime: 30 * 60 * 1000,
-    refetchOnWindowFocus: false,
+  useSeo({
+    title: "Contact: talk to a ProtPure scientist",
+    description: `Email ${SITE.email}, call ${SITE.phone} or send an enquiry. ${SITE.legalName}, GIDC V.U. Nagar, Anand, Gujarat, India.`,
   });
 
-  const posts: FeedPost[] = feed?.posts ?? [];
+  // Arriving from a product or application page: start the message for the visitor.
+  useEffect(() => {
+    if (about && !contact.message)
+      setContact({ ...contact, message: `I have a question about ${about.slice(0, 120)}.\n` });
+    // Run once per arrival; the draft itself is edited by the form.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [about]);
 
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const r = schema.safeParse(form);
-    if (!r.success) {
-      const errs: Record<string, string> = {};
-      r.error.issues.forEach((i) => i.path[0] && (errs[i.path[0] as string] = i.message));
-      setErrors(errs);
-      return;
-    }
-    setErrors({});
-    const submissionId = crypto.randomUUID();
-    supabase.functions
-      .invoke("send-transactional-email", {
-        body: {
-          templateName: "contact-submission",
-          idempotencyKey: `contact-${submissionId}`,
-          replyTo: form.email,
-          templateData: {
-            name: form.name,
-            company: form.company,
-            email: form.email,
-            message: form.message,
-          },
-        },
-      })
-      .catch((err) => {
-        console.error("Failed to send contact email", err);
-        toast.error("We couldn't deliver your message — please try again or email info@protpure.com");
-      });
-    toast.success("Message received", {
-      description: "We'll respond within 24–48 hours at info@protpure.com",
-    });
-    setForm({ name: "", company: "", email: "", message: "" });
-  };
+  const channels = [
+    { icon: Mail, label: "Email", value: SITE.email, href: `mailto:${SITE.email}` },
+    { icon: Phone, label: "Phone", value: SITE.phone, href: SITE.phoneHref },
+    {
+      icon: MessageCircle,
+      label: "WhatsApp",
+      value: "Chat with us",
+      href: whatsappUrl("Hello ProtPure, I would like to enquire about "),
+      external: true,
+    },
+    { icon: Linkedin, label: "LinkedIn", value: "Protpure Tech Pvt. Ltd.", href: SITE.linkedin, external: true },
+  ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1">
-        <PageHero
-          eyebrow="Contact"
-          title="Talk to our scientists"
-          description="Sample requests, technical questions, vendor onboarding — reach the team directly. Most inquiries are answered within one working day."
-          breadcrumbs={[{ label: "Home", to: "/" }, { label: "Contact" }]}
-        />
+    <>
+      <PageHeader
+        crumbs={[{ label: "Contact" }]}
+        eyebrow="Contact"
+        title={
+          <>
+            Talk to a <Em>scientist.</Em>
+          </>
+        }
+        lede="Questions about a resin, a method or a quotation go to the same team that develops and tests the product."
+      />
 
-        <section className="bg-white py-16">
-          <div className="max-w-[1280px] mx-auto px-6 md:px-10 grid lg:grid-cols-[1fr_1fr] gap-10">
-            {/* Contact cards */}
-            <div className="space-y-4">
-              <div className="text-[11px] font-semibold tracking-[0.15em] text-teal uppercase mb-1">
-                Reach us
-              </div>
-              <h2 className="font-serif text-2xl text-navy mb-5">Direct channels</h2>
-              <div className="grid sm:grid-cols-2 gap-3">
-                {contactCards.map((c) => (
-                  <a
-                    key={c.label}
-                    href={c.href}
-                    target={c.external ? "_blank" : undefined}
-                    rel={c.external ? "noopener noreferrer" : undefined}
-                    className="group rounded-xl border border-border bg-white p-5 hover:border-teal hover:shadow-[0_4px_16px_rgba(0,0,0,0.04)] transition-all"
-                  >
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-9 h-9 rounded-lg bg-teal-pale flex items-center justify-center group-hover:bg-teal group-hover:text-white text-teal transition-colors">
-                        <c.icon className="w-4 h-4" />
-                      </div>
-                      <div className="text-[11px] font-semibold tracking-[0.1em] uppercase text-slate-light">
-                        {c.label}
-                      </div>
-                    </div>
-                    <div className="text-[15px] font-semibold text-navy mb-1">{c.value}</div>
-                    <div className="text-[12px] text-slate">{c.hint}</div>
-                  </a>
+      <section className="shell grid gap-x-12 gap-y-14 py-14 md:py-20 lg:grid-cols-12">
+        <div className="lg:col-span-5">
+          <h2 className="label text-ink-3">Direct lines</h2>
+          <ul className="mt-4 border-t border-ink">
+            {channels.map(({ icon: Icon, label, value, href, external }) => (
+              <li key={label} className="border-b border-rule">
+                <a
+                  href={href}
+                  {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  className="group flex items-center gap-4 py-4"
+                >
+                  <Icon aria-hidden className="h-5 w-5 shrink-0 text-ink-3" />
+                  <span className="min-w-0">
+                    <span className="label block text-ink-3">{label}</span>
+                    <span className="mt-0.5 block truncate text-lg font-semibold tracking-tight group-hover:underline">
+                      {value}
+                    </span>
+                  </span>
+                  {external && (
+                    <>
+                      <ArrowUpRight aria-hidden className="ml-auto h-4 w-4 shrink-0 text-ink-3" />
+                      <span className="sr-only">(opens in a new tab)</span>
+                    </>
+                  )}
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          <h2 className="label mt-12 text-ink-3">Facility and office</h2>
+          <div className="mt-4 flex gap-4 border-t border-ink pt-5">
+            <MapPin aria-hidden className="mt-1 h-5 w-5 shrink-0 text-ink-3" />
+            <div>
+              <address className="text-lg font-medium not-italic leading-snug tracking-tight">
+                {SITE.legalName}
+                {SITE.address.lines.map((line) => (
+                  <span key={line} className="block">
+                    {line}
+                  </span>
                 ))}
-              </div>
-
-              <div className="rounded-xl border border-border bg-white overflow-hidden">
-                <div className="px-5 py-4 border-b border-border flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-teal" />
-                  <h3 className="text-sm font-semibold text-navy">Manufacturing facility</h3>
-                </div>
-                <div className="p-5">
-                  <p className="text-[13px] text-slate leading-relaxed mb-4">{ADDRESS}</p>
-                  <div className="aspect-[16/9] rounded-lg overflow-hidden border border-border">
-                    <iframe
-                      src={MAPS_EMBED}
-                      title="ProtPure facility map"
-                      className="w-full h-full"
-                      loading="lazy"
-                      referrerPolicy="no-referrer-when-downgrade"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Form */}
-            <form
-              onSubmit={onSubmit}
-              className="rounded-xl border border-border bg-secondary/40 p-7 self-start space-y-4"
-            >
-              <div>
-                <div className="text-[11px] font-semibold tracking-[0.15em] text-teal uppercase mb-1">
-                  Send a message
-                </div>
-                <h2 className="font-serif text-2xl text-navy">We'll get back to you</h2>
-              </div>
-              <div>
-                <Label htmlFor="c-name" className="text-xs">Name *</Label>
-                <Input id="c-name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="mt-1 bg-white" />
-                {errors.name && <p className="text-[11px] text-destructive mt-1">{errors.name}</p>}
-              </div>
-              <div>
-                <Label htmlFor="c-company" className="text-xs">Company</Label>
-                <Input id="c-company" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="mt-1 bg-white" />
-              </div>
-              <div>
-                <Label htmlFor="c-email" className="text-xs">Email *</Label>
-                <Input id="c-email" type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="mt-1 bg-white" />
-                {errors.email && <p className="text-[11px] text-destructive mt-1">{errors.email}</p>}
-              </div>
-              <div>
-                <Label htmlFor="c-msg" className="text-xs">Message *</Label>
-                <Textarea id="c-msg" rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value.slice(0, 2000) })} className="mt-1 bg-white" />
-                {errors.message && <p className="text-[11px] text-destructive mt-1">{errors.message}</p>}
-              </div>
-              <Button type="submit" className="w-full bg-teal hover:bg-teal-light text-white">
-                Send message
-              </Button>
-              <p className="text-[11px] text-slate-light text-center">
-                Replies sent from <span className="font-mono text-slate">info@protpure.com</span>
-              </p>
-            </form>
-          </div>
-        </section>
-
-        {/* LinkedIn feed */}
-        <section className="bg-background py-20">
-          <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-            <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
-              <div className="max-w-2xl">
-                <div className="text-[11px] font-semibold tracking-[0.15em] text-teal uppercase mb-3">
-                  Latest updates
-                </div>
-                <h2 className="font-serif text-3xl text-navy mb-2">From our LinkedIn</h2>
-                <p className="text-base text-slate leading-relaxed">
-                  Product launches, application notes, and behind-the-scenes from our Anand facility.
-                </p>
-              </div>
+              </address>
               <a
-                href={LINKEDIN_URL}
+                href={MAPS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-medium text-teal hover:text-teal-light"
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold hover:underline"
               >
-                <Linkedin className="w-4 h-4" /> Follow on LinkedIn <ExternalLink className="w-3 h-3" />
+                Open in Google Maps
+                <ArrowUpRight aria-hidden className="h-4 w-4" />
+                <span className="sr-only">(opens in a new tab)</span>
               </a>
             </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {feedLoading
-                ? Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="rounded-xl border border-border bg-white p-6 flex flex-col gap-3">
-                      <Skeleton className="h-8 w-8 rounded-md" />
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-4 w-full" />
-                      <Skeleton className="h-4 w-5/6" />
-                      <Skeleton className="h-4 w-3/4" />
-                    </div>
-                  ))
-                : posts.map((p) => (
-                    <a
-                      key={p.id}
-                      href={p.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group rounded-xl border border-border bg-white p-6 hover:border-teal transition-colors flex flex-col"
-                    >
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="w-8 h-8 rounded-md bg-[#0A66C2] flex items-center justify-center">
-                          <Linkedin className="w-4 h-4 text-white" />
-                        </div>
-                        <div className="text-[10px] uppercase tracking-wider text-teal font-semibold">
-                          {p.tag ?? format(new Date(p.publishedAt), "MMM d, yyyy")}
-                        </div>
-                      </div>
-                      {p.thumbnailUrl && (
-                        <img
-                          src={p.thumbnailUrl}
-                          alt=""
-                          loading="lazy"
-                          className="w-full h-32 object-cover rounded-md mb-3 border border-border"
-                        />
-                      )}
-                      <p className="text-[13px] text-slate leading-relaxed flex-1 whitespace-pre-line">
-                        {p.text}
-                      </p>
-                      <div className="mt-4 text-[12px] text-slate-light flex items-center justify-between">
-                        <span>{format(new Date(p.publishedAt), "MMM d, yyyy")}</span>
-                        <span className="flex items-center gap-1 group-hover:text-teal transition-colors">
-                          Read on LinkedIn <ExternalLink className="w-3 h-3" />
-                        </span>
-                      </div>
-                    </a>
-                  ))}
-            </div>
           </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
+        </div>
+
+        <div className="lg:col-span-7">
+          <div className="rounded-panel border border-rule bg-paper-2 p-6 sm:p-10">
+            <h2 className="heading-4">Send an enquiry</h2>
+            <p className="mt-2 text-ink-2">
+              Tell us what you are working on. The more detail, the more useful our reply.
+            </p>
+            {count > 0 && (
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-rule bg-card p-4">
+                <p className="text-[0.9375rem]">
+                  You have <span className="font-semibold">{count}</span> {count === 1 ? "item" : "items"} on your quote
+                  list.
+                </p>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={() => setOpen(true)}>
+                    Review and send
+                  </Button>
+                  <Button size="sm" variant="outline" asChild>
+                    <Link to="/quote">Full page</Link>
+                  </Button>
+                </div>
+              </div>
+            )}
+            <EnquiryForm
+              className="mt-8"
+              items={NO_ITEMS}
+              doneAction={
+                <Button variant="outline" asChild>
+                  <Link to="/products">Browse products</Link>
+                </Button>
+              }
+            />
+          </div>
+        </div>
+      </section>
+
+      <LinkedInFeed />
+    </>
   );
 }

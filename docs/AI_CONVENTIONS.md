@@ -2,7 +2,7 @@
 title: AI Conventions
 description: Guardrails, anti-patterns, and decision records for future AI sessions
 phase: production
-last_updated: 2026-07-09
+last_updated: 2026-10-02
 owner: Protpure engineering
 ---
 
@@ -13,14 +13,19 @@ Rules for any agent (human or AI) editing this codebase. These are not suggestio
 ## Core architectural rules
 
 - **Client-only React app.** No Node/Python/Ruby servers in the repo. All backend logic lives in `supabase/functions/*` (Deno) or the database.
-- **RFQ is the only conversion path.** Every product / CTA / compare / selector flow funnels into `RFQContext` → `send-transactional-email`. Do not add a checkout, cart, or per-user account without explicit user request.
+- **RFQ is the only conversion path.** Every product / CTA / service / document flow funnels into `RFQContext` → `lib/enquiry.ts` → `send-transactional-email`. Do not add a checkout, cart, prices, or per-user account without explicit user request.
+- **One sender.** `submitEnquiry` in `src/lib/enquiry.ts` is the only code that calls `send-transactional-email`. A form may show a confirmation only after it returns `{ ok: true }`; on failure it must offer the email / WhatsApp fallback.
+- **No samples.** The site never offers samples, free or otherwise (client instruction). `src/test/catalog.test.ts` fails if such wording appears.
+- **Sourced content only.** Every number and claim must be traceable to a client document listed in `docs/CONTENT_SOURCES.md`. If the documents disagree, follow the product list and record the conflict there. Never invent placeholder data, posts, downloads or file sizes.
 - **No end-user auth.** Adding sign-up/login requires an explicit user decision; it isn't free — it changes RLS, edge-function gating, and content strategy.
 - **Never edit** `src/integrations/supabase/client.ts`, `src/integrations/supabase/types.ts`, `.env`, or `supabase/config.toml` project-level settings. They are auto-generated.
 
 ## UI / design conventions
 
 - **Semantic HSL tokens only.** Colors live in `src/index.css` and are consumed via Tailwind theme + shadcn variants. No `text-white`, `bg-black`, or `bg-[#...]` in components.
-- **Typography**: serif for headings, sans-serif for body. Do not introduce Inter/Poppins/generic AI-default stacks.
+- **Typography**: Schibsted Grotesk for headings and body, one Old Standard TT Italic accent word per headline (`.em`), IBM Plex Mono for labels. See `docs/DESIGN_SYSTEM.md`. Do not introduce Inter/Poppins/generic AI-default stacks.
+- **Units keep their case.** `.label` uppercases text: never use it for `mL`, `µm`, `cm/h`, element symbols or catalogue numbers. Use `.code`.
+- **Family colours always carry a text label**, and coral (`signal`) is never used as a text colour for small type or behind white text.
 - **shadcn/ui first.** Prefer extending existing primitives over hand-rolled components.
 - **Mobile-first responsive.** Use Tailwind breakpoints; every page must be usable at 360px width.
 - **Preserve dark-mode compatibility** in every color choice.
@@ -38,7 +43,9 @@ Rules for any agent (human or AI) editing this codebase. These are not suggestio
 - Keep files small and focused; one component per file where practical.
 - UI-only changes stay in presentation code. Do not refactor business logic (RFQ, email, docs auth) unless the user explicitly asks.
 - Use TanStack Query for all remote reads; contexts only for cross-page ephemeral state.
-- Global overlays (`RFQDrawer`, `WhatsAppFAB`) are mounted in `App.tsx` — do not remount inside pages.
+- Global overlays (`RFQDrawer`, `CompareTray`, `WhatsAppButton`) are mounted once in `components/site/SiteLayout.tsx` — do not remount inside pages.
+- Catalogue content lives in `src/data/*`. Pages read it; they do not hard-code product facts. After editing data, run `npm test`.
+- Charts follow the rules in `docs/DESIGN_SYSTEM.md` (one series, direct labels, data-table twin).
 
 ## Anti-patterns (never do)
 
@@ -57,10 +64,13 @@ Rules for any agent (human or AI) editing this codebase. These are not suggestio
 | --- | --- | --- |
 | 1 | Password-gated docs hub instead of full user auth | Small partner audience; a shared password + short-lived JWT is enough and avoids account management |
 | 2 | pgmq + pg_cron for transactional email | Keeps everything inside Lovable Cloud, retries survive worker restarts, no external queue vendor |
-| 3 | Curated LinkedIn fallback | The public LinkedIn API often lacks `r_organization_social`; a static curated list keeps the Contact page useful |
+| 3 | LinkedIn feed shows live posts only | The earlier "curated fallback" was invented placeholder news. The function now returns no posts when LinkedIn is unreachable and the Contact page hides the block (2026-10) |
 | 4 | RFQ email idempotency via `idempotency_key` | Prevents double-sends from React StrictMode + retries |
-| 5 | Products stored in Postgres, not JSON files | Enables filtering/sorting server-side and future admin edits without redeploy |
-| 6 | No dark mode toggle exposed | Brand is a single warm-light theme; dark mode support is preserved in tokens for future flexibility |
+| 5 | Catalogue is typed data in `src/data`, not Postgres | The `products` table was never read by the live site and held the 2025 range. 19 product lines change a few times a year; typed modules with tests are cheaper to keep correct than an unmaintained admin path. The table is left in place, unused (2026-10) |
+| 6 | No dark mode toggle exposed | Brand is a single warm-light theme; `.dark` shares the `theme-ink` token mapping used for dark sections |
+| 7 | Client PDFs are offered "on request", not as downloads | The current PDFs disagree with each other on specifications. Publish a file only after the client has corrected it (`file` in `src/data/resources.ts`) |
+| 8 | Hand-written SVG charts, no chart library in the public bundle | Four small charts; full control over labels, contrast and the table twin |
+| 9 | Contact validation without a schema library | Six fields; the schema library added about 80 kB to the main bundle |
 
 ## Guardrail mindmap
 
@@ -69,7 +79,8 @@ mindmap
   root((Protpure guardrails))
     Design
       Semantic HSL tokens only
-      Serif headings + sans body
+      Grotesk + one serif accent word
+      Units keep their case
       shadcn primitives first
       Mobile-first
     Backend
@@ -84,13 +95,15 @@ mindmap
       Suppression list respected
     UX
       RFQ is the only conversion
-      Global drawer + WhatsApp FAB
-      Compare feeds RFQ
-      No checkout / cart
+      One enquiry sender, honest states
+      Global drawer + WhatsApp button
+      No checkout / cart / prices
+      No samples
     Content
-      Product data in Postgres
+      Catalogue in src/data, tested
+      Sourced claims only
       Docs in Postgres Markdown
-      LinkedIn feed with fallback
+      LinkedIn feed: live posts only
       SEO metadata on every page
     Do-not-touch
       supabase/client.ts

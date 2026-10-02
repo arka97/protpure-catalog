@@ -2,11 +2,35 @@
 title: Data Model
 description: Tables, columns, enums, RLS policies, and relationships
 phase: production
-last_updated: 2026-07-09
+last_updated: 2026-10-02
 owner: Protpure engineering
 ---
 
 # Data model
+
+## Catalogue data (in code)
+
+Since the 2026 revamp the catalogue is typed data in `src/data`, described by `src/types/catalog.ts`.
+The site does not read the `products` table below.
+
+| Module | Shape | Notes |
+| --- | --- | --- |
+| `families.ts` | `Family[]`, `Grade[]`, `Stage[]` | 9 families (6 resin techniques, 3 formats), 3 grades, 3 stages |
+| `catalog.ts` | `Product[]` | A product line has `variants` (grades or formats); each variant has `specs` and `packs` |
+| `packs.ts` | `Record<variantId, Pack[]>` | 190 catalogue numbers; `Pack = { catNo, size }` |
+| `hardware.ts` | `EmptyColumn[]` | 64 empty columns |
+| `applications.ts` | `Application[]` → `SubApplication[]` → `stages` | Each stage lists `ResinRef`s that link to a product (and grade) or a family |
+| `services.ts` | `Service[]` | SC001–SC004 |
+| `evidence.ts` | constants | Measured data behind the charts |
+| `resources.ts` | `Resource[]`, glossary | A resource with `file` downloads; without it, it is requested by enquiry |
+
+Quote-list items (`RFQItem` in `src/lib/enquiry.ts`) are keyed by catalogue number and have a `kind`:
+`product`, `hardware`, `service` or `document`.
+
+Integrity is checked by `src/test/catalog.test.ts`: counts match the client's sheets, catalogue numbers are
+unique, and every related product, featured product, document link and application recommendation resolves.
+
+## Backend tables
 
 All tables live in the `public` schema. Row-Level Security is enabled on every table; the anon Data API can only read `products`. Everything else is service-role only and touched exclusively by edge functions.
 
@@ -23,7 +47,8 @@ All tables live in the `public` schema. Row-Level Security is enabled on every t
 
 ### `products`
 
-Public catalog for the Products page and RFQ prefill.
+Legacy public catalog (2025 range). **Not read by the site since the 2026 revamp**; kept so nothing in the
+backend has to change. Drop it, or re-seed it from `src/data`, if a database-backed catalogue is ever wanted.
 
 | Column | Type | Notes |
 | --- | --- | --- |

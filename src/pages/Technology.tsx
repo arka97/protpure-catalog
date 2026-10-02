@@ -1,181 +1,386 @@
-import { useState } from "react";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
-import { PageHero } from "@/components/layout/PageHero";
-import { CTABand } from "@/components/home/CTABand";
-import { BeadSizeSelector } from "@/components/products/BeadSizeSelector";
-import { FlowVariant } from "@/data/products";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
+import { AddToQuote } from "@/components/catalog/AddToQuote";
+import { AnchorLink } from "@/components/site/AnchorLink";
+import { CTASection } from "@/components/site/CTASection";
+import { PageHeader } from "@/components/site/PageHeader";
+import { Photo } from "@/components/site/Photo";
+import { Reveal } from "@/components/site/Reveal";
+import { Em, SectionHeader } from "@/components/site/Section";
+import {
+  AsymmetryChart,
+  EfficiencyChart,
+  EfficiencyTable,
+  HyIonicModes,
+  KavChart,
+  KavTable,
+} from "@/components/viz/Evidence";
+import { GradeScale } from "@/components/viz/GradeScale";
+import { Halftone } from "@/components/viz/Halftone";
+import { StatTile } from "@/components/viz/StatTile";
+import { productsByFamily } from "@/data/catalog";
+import { CAPABILITIES } from "@/data/company";
+import { DEAE_PRECISE, IEX_COLUMN_TEST, SEC_CALIBRATION } from "@/data/evidence";
+import { familyById, RESIN_FAMILY_IDS } from "@/data/families";
+import { PHOTOS } from "@/data/photos";
+import { FAMILY_STYLE } from "@/lib/family-style";
+import { useSeo } from "@/lib/seo";
+import { cn } from "@/lib/utils";
 
-const steps = [
-  {
-    n: "01",
-    title: "Bead formation",
-    desc: "Aqueous agarose is emulsified into uniform spherical droplets using controlled-shear reactors. Bead size distribution is tuned for the target variant (HR through Faster).",
-  },
-  {
-    n: "02",
-    title: "Cross-linking",
-    desc: "Beads are chemically cross-linked to deliver pH 2–14 CIP stability and rigidity for high-flow operation without bed compression.",
-  },
-  {
-    n: "03",
-    title: "Ligand coupling",
-    desc: "Functional ligands (sulphopropyl, quaternary amine, Ni-NTA, phenyl, etc.) are covalently attached. Coupling chemistry is selected to maximise effective ligand density.",
-  },
-  {
-    n: "04",
-    title: "QC & release",
-    desc: "Every lot is tested for particle size distribution, ionic capacity, DBC, HETP, and asymmetry on a packed column before release.",
-  },
-];
+const section = "py-20 md:py-28";
 
-const efficiency = [
-  { label: "Asymmetry (As)", value: "1.63", note: "Target ≤ 1.6 (passes)" },
-  { label: "Reduced plate height (h)", value: "1.04", note: "Target ≤ 3.0 (well-packed)" },
-  { label: "HETP", value: "0.021 cm", note: "Acetone, 30 cm/hr, 16/40" },
-  { label: "Bed compression", value: "<5%", note: "At 700 cm/hr operational flow" },
-];
+/* Heading for one data set inside the "Performance data" section. */
+function Study({
+  id,
+  kicker,
+  title,
+  source,
+  children,
+}: {
+  id: string;
+  kicker: string;
+  title: string;
+  source: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section id={id} aria-labelledby={`${id}-title`} className="border-t border-rule py-12 md:py-16">
+      <div className="grid gap-x-12 gap-y-8 lg:grid-cols-12">
+        <div className="lg:col-span-4">
+          <p className="label text-signal-ink">{kicker}</p>
+          <h3 id={`${id}-title`} className="heading-4 mt-3">
+            {title}
+          </h3>
+          <p className="mt-3 text-[0.9375rem] text-ink-2">{source}</p>
+        </div>
+        <div className="min-w-0 lg:col-span-8">{children}</div>
+      </div>
+    </section>
+  );
+}
 
 export default function Technology() {
-  const [active, setActive] = useState<FlowVariant>("standard");
+  const last = DEAE_PRECISE.pressureFlow[DEAE_PRECISE.pressureFlow.length - 1];
+
+  useSeo({
+    title: "Technology and performance data",
+    description:
+      "How ProtPure resins are built: cross-linked agarose beads, in-house ligand chemistry and three performance grades. With measured column efficiency, binding capacity and SEC calibration data.",
+  });
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1">
-        <PageHero
-          eyebrow="Technology"
-          title="6% cross-linked agarose, engineered four ways"
-          description="One backbone chemistry, four particle-size variants. Same selectivity, different flow and resolution profiles — so you can scale without re-developing the method."
-          breadcrumbs={[{ label: "Home", to: "/" }, { label: "Technology" }]}
-        />
+    <>
+      <PageHeader
+        crumbs={[{ label: "Technology" }]}
+        eyebrow="Technology and data"
+        title={
+          <>
+            Agarose, engineered bead by <Em>bead.</Em>
+          </>
+        }
+        lede="Every ProtPure resin is built on agarose beads made in our own facility. The bead, the ligand chemistry and the column testing are all done in-house, and we publish the measurements."
+        aside={
+          <nav aria-label="On this page">
+            <ul className="border-t border-ink">
+              {[
+                ["platform", "The platform"],
+                ["techniques", "Six separation techniques"],
+                ["grades", "Three performance grades"],
+                ["data", "Performance data"],
+              ].map(([target, label], i) => (
+                <li key={target} className="border-b border-rule">
+                  <AnchorLink target={target} className="group flex items-center gap-4 py-3.5">
+                    <span className="label text-ink-3">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="font-semibold">{label}</span>
+                    <ArrowRight
+                      aria-hidden
+                      className="ml-auto h-4 w-4 text-ink-3 transition-transform group-hover:translate-x-1"
+                    />
+                  </AnchorLink>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        }
+      />
 
-        <section className="bg-white py-20">
-          <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-            <div className="grid md:grid-cols-[1.2fr_1fr] gap-12 items-start">
-              <div>
-                <div className="text-[11px] font-semibold tracking-[0.15em] text-teal uppercase mb-3">
-                  Platform
-                </div>
-                <h2 className="font-serif text-3xl text-navy mb-5">The agarose backbone</h2>
-                <div className="space-y-4 text-[15px] text-slate leading-relaxed">
-                  <p>
-                    All ProtPure resins are built on a 6% spherical cross-linked agarose matrix.
-                    Agarose is chosen for its biocompatibility, low non-specific binding, and
-                    open pore structure — letting large biomolecules diffuse to internal binding
-                    sites at industrially relevant flow rates.
-                  </p>
-                  <p>
-                    Cross-linking gives the matrix the mechanical rigidity to operate up to 1000
-                    cm/hr with &lt;5% bed compression, plus chemical stability across pH 2–14 for
-                    standard CIP and sanitisation regimes (1 M NaOH, 8 M urea, 6 M GuHCl).
-                  </p>
-                  <p>
-                    Selectivity is then tuned by the ligand chemistry — strong/weak ion exchangers,
-                    Ni-NTA for IMAC, phenyl for HIC, and magnetic variants for batch processing.
-                  </p>
-                </div>
+      {/* Platform */}
+      <section id="platform" className={section} aria-labelledby="platform-title">
+        <div className="shell">
+          <SectionHeader
+            index="01"
+            eyebrow="The platform"
+            title={
+              <span id="platform-title">
+                Made here, start to <Em>finish.</Em>
+              </span>
+            }
+            lede="Keeping every step in-house, from bead formation to the packed-column test, is how we control reproducibility."
+          />
+          <div className="mt-12 grid gap-x-12 gap-y-10 lg:mt-16 lg:grid-cols-12">
+            <ol className="lg:col-span-7">
+              {CAPABILITIES.map((c, i) => (
+                <Reveal
+                  as="li"
+                  key={c.title}
+                  className="grid grid-cols-[3rem_1fr] gap-x-4 border-t border-rule py-6 first:border-ink"
+                >
+                  <span className="label pt-1.5 text-ink-3">{String(i + 1).padStart(2, "0")}</span>
+                  <div>
+                    <h3 className="text-xl font-semibold tracking-tight">{c.title}</h3>
+                    <p className="mt-2 max-w-xl text-ink-2">{c.text}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </ol>
+            <Photo
+              photo={PHOTOS.labFplc}
+              sizes="(min-width: 1024px) 38vw, 100vw"
+              caption="Protein purification system in the applications laboratory"
+              className="lg:col-span-5"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Techniques */}
+      <section
+        id="techniques"
+        className={cn(section, "border-y border-rule bg-paper-2")}
+        aria-labelledby="techniques-title"
+      >
+        <div className="shell">
+          <SectionHeader
+            index="02"
+            eyebrow="Separation techniques"
+            title={
+              <span id="techniques-title">
+                Six ways to separate a <Em>mixture.</Em>
+              </span>
+            }
+            lede="Each technique separates on a different property of the molecule. Combining two or three of them in sequence is what takes a crude feed to a pure product."
+          />
+          <ul className="mt-12 grid gap-4 md:grid-cols-2 lg:mt-16">
+            {RESIN_FAMILY_IDS.map((id) => {
+              const f = familyById(id);
+              return (
+                <Reveal
+                  as="li"
+                  key={id}
+                  className="group relative flex gap-5 rounded-panel border border-rule bg-card p-6"
+                >
+                  <span
+                    className={cn("grid h-20 w-20 shrink-0 place-items-center rounded-lg", FAMILY_STYLE[f.color].tint)}
+                  >
+                    <Halftone family={id} cells={9} className="h-14 w-14" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="label text-ink-3">{f.abbr}</p>
+                    <h3 className="mt-1 text-xl font-semibold leading-tight tracking-tight">
+                      <Link
+                        to={`/products?family=${id}`}
+                        className="after:absolute after:inset-0 after:rounded-panel after:content-['']"
+                      >
+                        {f.title}
+                      </Link>
+                    </h3>
+                    <p className="mt-2 text-[0.9375rem] leading-snug text-ink-2">{f.principle}</p>
+                    <p className="mt-3 text-[0.8125rem] font-medium text-foreground">
+                      {productsByFamily(id)
+                        .map((p) => p.name)
+                        .join(" · ")}
+                    </p>
+                  </div>
+                </Reveal>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+
+      {/* Grades */}
+      <section id="grades" className={section} aria-labelledby="grades-title">
+        <div className="shell">
+          <SectionHeader
+            index="03"
+            eyebrow="Performance grades"
+            title={
+              <span id="grades-title">
+                Bead size decides flow and <Em>resolution.</Em>
+              </span>
+            }
+            lede="Larger beads let liquid through faster at the same pressure. Smaller beads shorten diffusion paths and sharpen peaks. Three grades cover the range from capture to polishing."
+          />
+          <Reveal className="mt-12 lg:mt-16">
+            <GradeScale />
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Data */}
+      <section id="data" className="border-t border-rule pt-20 md:pt-28" aria-labelledby="data-title">
+        <div className="shell">
+          <SectionHeader
+            index="04"
+            eyebrow="Performance data"
+            title={
+              <span id="data-title">
+                Measured, not <Em>claimed.</Em>
+              </span>
+            }
+            lede="These are results from our own column tests, with the conditions they were measured under. Ask for the full reports with your quotation."
+            className="pb-12 md:pb-16"
+          />
+
+          <Study
+            id="deae"
+            kicker="Ion exchange"
+            title="DEAE Agarose Precise: efficiency, pressure and capacity"
+            source={`${DEAE_PRECISE.column} column. ${DEAE_PRECISE.test}. May 2026.`}
+          >
+            <div className="grid gap-x-10 gap-y-10 md:grid-cols-2">
+              <EfficiencyChart />
+              <AsymmetryChart />
+            </div>
+            <EfficiencyTable className="mt-6" />
+            <div className="mt-8 grid gap-x-8 gap-y-8 sm:grid-cols-3">
+              <StatTile
+                value={DEAE_PRECISE.dbc.measured}
+                unit="mg BSA/mL"
+                label="Dynamic binding capacity"
+                note="Measured with BSA at 10% breakthrough"
+              />
+              <StatTile
+                value={last.pressureMPa.toFixed(2)}
+                unit="MPa"
+                label="Pressure drop"
+                note={`At ${last.velocity} cm/h over a 45 cm bed`}
+              />
+              <StatTile
+                value={DEAE_PRECISE.packing.compression}
+                label="Bed compression"
+                note={`${DEAE_PRECISE.packing.settledBed} settled to ${DEAE_PRECISE.packing.packedBed} packed, at ${DEAE_PRECISE.packing.packingVelocity}`}
+              />
+            </div>
+            <p className="mt-8 max-w-2xl text-[0.9375rem] text-ink-2">
+              Pressure–flow curves at 18 cm and 45 cm bed heights overlap, and the column was run above 400 cm/h.
+              Matching profiles at both bed heights support scale-up.
+            </p>
+          </Study>
+
+          <Study
+            id="column-test"
+            kicker="Ion exchange"
+            title="Packed-column acceptance test"
+            source="Column efficiency test on a packed ion-exchange column, February 2026."
+          >
+            <div className="grid gap-x-8 gap-y-8 sm:grid-cols-2">
+              <StatTile
+                size="lg"
+                value={IEX_COLUMN_TEST.asymmetry.value}
+                label="Asymmetry factor, As"
+                note={`Acceptance: ${IEX_COLUMN_TEST.asymmetry.acceptance}`}
+              />
+              <StatTile
+                size="lg"
+                value={IEX_COLUMN_TEST.reducedPlateHeight.value}
+                label="Reduced plate height, h"
+                note={`Acceptance: ${IEX_COLUMN_TEST.reducedPlateHeight.acceptance}`}
+              />
+            </div>
+          </Study>
+
+          <Study
+            id="sec"
+            kicker="Size exclusion"
+            title="Molecular weight calibration and column performance"
+            source={`${SEC_CALIBRATION.resin}. Column: ${SEC_CALIBRATION.column}. April 2026.`}
+          >
+            <div className="grid gap-x-10 gap-y-10 md:grid-cols-5">
+              <div className="min-w-0 md:col-span-3">
+                <KavChart />
+                <KavTable className="mt-4" />
               </div>
-
-              <div className="bg-navy rounded-xl p-8 hex-pattern relative overflow-hidden">
-                <div className="text-[11px] font-semibold tracking-[0.15em] text-teal-bright uppercase mb-2 relative">
-                  Backbone
-                </div>
-                <h3 className="font-serif text-2xl text-white mb-6 relative">6% agarose</h3>
-                <div className="space-y-3 relative">
-                  {[
-                    ["Pore size", "Optimised for >150 kDa proteins"],
-                    ["Mechanical rigidity", "Stable to 1000 cm/hr"],
-                    ["pH stability", "2–14 (CIP), 3–12 (operational)"],
-                    ["Non-specific binding", "Minimal across all chemistries"],
-                  ].map(([k, v]) => (
-                    <div
-                      key={k}
-                      className="flex justify-between items-baseline gap-4 border-b border-white/10 pb-2.5"
-                    >
-                      <span className="text-[12px] text-on-navy-muted">{k}</span>
-                      <span className="text-[13px] text-white font-medium text-right">{v}</span>
+              <div className="space-y-8 md:col-span-2">
+                <StatTile
+                  value={SEC_CALIBRATION.suitability.platesPerMetre.toLocaleString("en-IN")}
+                  label="Theoretical plates per metre"
+                  note={`${SEC_CALIBRATION.suitability.peak} peak`}
+                />
+                <StatTile
+                  value={SEC_CALIBRATION.suitability.asymmetry}
+                  label="Asymmetry factor"
+                  note={`HETP ${SEC_CALIBRATION.suitability.hetpCm} cm`}
+                />
+                <dl className="border-t border-ink">
+                  <div className="grid grid-cols-2 gap-4 border-b border-rule py-3">
+                    <dt className="text-[0.875rem] text-ink-2">Fractionation range</dt>
+                    <dd className="text-[0.9375rem] font-semibold">{SEC_CALIBRATION.fractionationRange}</dd>
+                  </div>
+                  {SEC_CALIBRATION.specs.map((s) => (
+                    <div key={s.label} className="grid grid-cols-2 gap-4 border-b border-rule py-3">
+                      <dt className="text-[0.875rem] text-ink-2">{s.label}</dt>
+                      <dd className="text-[0.9375rem] font-semibold">{s.value}</dd>
                     </div>
                   ))}
-                </div>
+                </dl>
               </div>
             </div>
+          </Study>
+
+          <Study
+            id="hy-ionic"
+            kicker="Mixed-mode"
+            title="Hy-Ionic™ DP: capacity in each mode"
+            source="Dynamic binding capacity at 10% breakthrough with BSA, 1 mL column, 40 cm/h (4 min residence time). October 2026."
+          >
+            <HyIonicModes />
+            <p className="mt-6 max-w-2xl text-[0.9375rem] text-ink-2">
+              The same packed column was then stored in 0.1 M NaOH for 30 days. When the binding experiments were
+              repeated, the dynamic binding capacity was retained.{" "}
+              <Link to="/products/hy-ionic-dp" className="font-medium text-foreground underline underline-offset-4">
+                Hy-Ionic™ DP Agarose
+              </Link>
+            </p>
+          </Study>
+        </div>
+      </section>
+
+      <section className="shell pb-20 md:pb-28" aria-label="Request the reports">
+        <div className="flex flex-wrap items-center justify-between gap-6 rounded-panel bg-paper-2 p-6 sm:p-8">
+          <div>
+            <p className="heading-4">Want the full reports?</p>
+            <p className="mt-2 max-w-xl text-ink-2">
+              The DEAE Agarose Precise performance data and the SEC calibration note are sent on request.
+            </p>
           </div>
-        </section>
-
-        <section className="bg-background py-20">
-          <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-            <div className="mb-12 max-w-2xl">
-              <div className="text-[11px] font-semibold tracking-[0.15em] text-teal uppercase mb-3">
-                Bead size selector
-              </div>
-              <h2 className="font-serif text-3xl text-navy mb-3">Pick a particle, see the trade-off</h2>
-              <p className="text-base text-slate leading-relaxed">
-                Smaller beads = higher resolution, lower flow. Larger beads = higher throughput,
-                lower back-pressure. Same chemistry, same selectivity.
-              </p>
-            </div>
-
-            <BeadSizeSelector active={active} onChange={setActive} />
+          <div className="flex flex-wrap gap-2">
+            <AddToQuote
+              size="default"
+              item={{
+                id: "doc-tn-deae-precise",
+                kind: "document",
+                name: "DEAE Agarose Precise: performance data",
+                href: "/resources",
+              }}
+              label="DEAE performance data"
+            />
+            <AddToQuote
+              size="default"
+              variant="outline"
+              item={{
+                id: "doc-tn-sec-calibration",
+                kind: "document",
+                name: "SEC: molecular weight calibration and column performance",
+                href: "/resources",
+              }}
+              label="SEC calibration note"
+            />
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="bg-white py-20">
-          <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-            <div className="mb-12 max-w-2xl">
-              <div className="text-[11px] font-semibold tracking-[0.15em] text-teal uppercase mb-3">
-                Manufacturing
-              </div>
-              <h2 className="font-serif text-3xl text-navy mb-3">From monomer to packed column</h2>
-              <p className="text-base text-slate leading-relaxed">
-                Four controlled steps from raw agarose to a release-tested resin lot.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {steps.map((s) => (
-                <div
-                  key={s.n}
-                  className="bg-white border border-border rounded-xl p-6 hover:border-teal-pale transition-colors relative"
-                >
-                  <div className="font-mono text-[11px] text-teal font-semibold tracking-wider mb-3">
-                    {s.n}
-                  </div>
-                  <h3 className="font-serif text-lg text-navy mb-2">{s.title}</h3>
-                  <p className="text-[13px] text-slate leading-relaxed">{s.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-navy hex-pattern py-20">
-          <div className="max-w-[1280px] mx-auto px-6 md:px-10">
-            <div className="mb-10 max-w-2xl">
-              <div className="text-[11px] font-semibold tracking-[0.15em] text-teal-bright uppercase mb-3">
-                Column efficiency
-              </div>
-              <h2 className="font-serif text-3xl text-white mb-3">Tested on every lot</h2>
-              <p className="text-base text-on-navy leading-relaxed">
-                Standard test: acetone tracer, 30 cm/hr, 16/40 column packed at 700 cm/hr.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {efficiency.map((e) => (
-                <div key={e.label} className="bg-white/[0.05] border border-white/10 rounded-xl p-6">
-                  <div className="text-[10px] uppercase tracking-wider text-on-navy-muted font-semibold mb-3">
-                    {e.label}
-                  </div>
-                  <div className="font-serif text-3xl text-white mb-2">{e.value}</div>
-                  <div className="text-[12px] text-on-navy">{e.note}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <CTABand />
-      </main>
-      <Footer />
-    </div>
+      <CTASection />
+    </>
   );
 }

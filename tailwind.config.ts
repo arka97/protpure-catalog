@@ -1,4 +1,8 @@
 import type { Config } from "tailwindcss";
+import typography from "@tailwindcss/typography";
+import animate from "tailwindcss-animate";
+
+const hsl = (name: string) => `hsl(var(--${name}) / <alpha-value>)`;
 
 export default {
   darkMode: ["class"],
@@ -14,101 +18,92 @@ export default {
     },
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        navy: {
-          DEFAULT: "hsl(var(--navy))",
-          2: "hsl(var(--navy-2))",
-          3: "hsl(var(--navy-3))",
+        border: hsl("border"),
+        input: hsl("input"),
+        ring: hsl("ring"),
+        background: hsl("background"),
+        foreground: hsl("foreground"),
+
+        /* Brand palette */
+        paper: { DEFAULT: hsl("paper"), 2: hsl("paper-2") },
+        rule: hsl("rule"),
+        ink: {
+          DEFAULT: hsl("ink"),
+          2: hsl("ink-2"),
+          3: hsl("ink-3"),
+          line: hsl("ink-line"),
+          raised: hsl("ink-raised"),
         },
-        teal: {
-          DEFAULT: "hsl(var(--teal))",
-          light: "hsl(var(--teal-light))",
-          bright: "hsl(var(--teal-bright))",
-          pale: "hsl(var(--teal-pale))",
-          "pale-2": "hsl(var(--teal-pale-2))",
-        },
-        slate: {
-          DEFAULT: "hsl(var(--slate))",
-          light: "hsl(var(--slate-light))",
-        },
-        "on-navy": "hsl(var(--on-navy))",
-        "on-navy-muted": "hsl(var(--on-navy-muted))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
+        "on-ink": { DEFAULT: hsl("on-ink"), 2: hsl("on-ink-2") },
+        brand: { DEFAULT: hsl("brand"), dot: hsl("brand-dot") },
+        signal: { DEFAULT: hsl("signal"), ink: hsl("signal-ink") },
+
+        /* Chromatography families */
+        imac: { DEFAULT: hsl("imac"), tint: hsl("imac-tint") },
+        iex: { DEFAULT: hsl("iex"), tint: hsl("iex-tint") },
+        hic: { DEFAULT: hsl("hic"), tint: hsl("hic-tint") },
+        mrc: { DEFAULT: hsl("mrc"), tint: hsl("mrc-tint") },
+        sec: { DEFAULT: hsl("sec"), tint: hsl("sec-tint") },
+        fmt: { DEFAULT: hsl("fmt"), tint: hsl("fmt-tint") },
+
+        /* shadcn/ui */
+        primary: { DEFAULT: hsl("primary"), foreground: hsl("primary-foreground") },
+        secondary: { DEFAULT: hsl("secondary"), foreground: hsl("secondary-foreground") },
+        destructive: { DEFAULT: hsl("destructive"), foreground: hsl("destructive-foreground") },
+        muted: { DEFAULT: hsl("muted"), foreground: hsl("muted-foreground") },
+        accent: { DEFAULT: hsl("accent"), foreground: hsl("accent-foreground") },
+        popover: { DEFAULT: hsl("popover"), foreground: hsl("popover-foreground") },
+        card: { DEFAULT: hsl("card"), foreground: hsl("card-foreground") },
         sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
+          DEFAULT: hsl("sidebar-background"),
+          foreground: hsl("sidebar-foreground"),
+          primary: hsl("sidebar-primary"),
+          "primary-foreground": hsl("sidebar-primary-foreground"),
+          accent: hsl("sidebar-accent"),
+          "accent-foreground": hsl("sidebar-accent-foreground"),
+          border: hsl("sidebar-border"),
+          ring: hsl("sidebar-ring"),
         },
       },
       fontFamily: {
-        sans: ['"DM Sans"', "system-ui", "sans-serif"],
-        serif: ['"DM Serif Display"', "Georgia", "serif"],
-        mono: ['"DM Mono"', "ui-monospace", "monospace"],
+        sans: ['"Schibsted Grotesk"', "ui-sans-serif", "system-ui", "-apple-system", '"Segoe UI"', "sans-serif"],
+        serif: ['"Old Standard TT"', "Georgia", '"Times New Roman"', "serif"],
+        mono: ['"IBM Plex Mono"', "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        panel: "1.75rem",
+      },
+      screens: {
+        xs: "420px",
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "fade-up": {
+          from: { opacity: "0", transform: "translateY(10px)" },
+          to: { opacity: "1", transform: "none" },
+        },
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-50%)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-up": "fade-up 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both",
+        marquee: "marquee 38s linear infinite",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [animate, typography],
 } satisfies Config;
