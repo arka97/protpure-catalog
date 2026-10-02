@@ -5,6 +5,7 @@ import { CTASection } from "@/components/site/CTASection";
 import { PageHeader } from "@/components/site/PageHeader";
 import { Reveal } from "@/components/site/Reveal";
 import { Em, SectionHeader } from "@/components/site/Section";
+import { MoleculeGlyph } from "@/components/viz/MoleculeGlyph";
 import { APPLICATIONS } from "@/data/applications";
 import { STAGES } from "@/data/families";
 import { useSeo } from "@/lib/seo";
@@ -102,11 +103,16 @@ export default function Applications() {
               <Reveal as="li" key={a.slug} className="group relative border-b border-rule">
                 <div className="grid gap-x-10 gap-y-3 py-7 md:grid-cols-12 md:py-9">
                   <p className="label pt-2 text-ink-3 md:col-span-1">{String(i + 1).padStart(2, "0")}</p>
-                  <h3 className="heading-4 md:col-span-4">
-                    <Link to={`/applications/${a.slug}`} className="after:absolute after:inset-0 after:content-['']">
-                      {a.title}
-                    </Link>
-                  </h3>
+                  <div className="flex items-start gap-4 md:col-span-4">
+                    <span className="grid h-14 w-14 shrink-0 place-items-center rounded-lg border border-rule bg-card transition-colors group-hover:border-ink/60">
+                      <MoleculeGlyph slug={a.slug} className="h-10 w-10" />
+                    </span>
+                    <h3 className="heading-4 pt-1">
+                      <Link to={`/applications/${a.slug}`} className="after:absolute after:inset-0 after:content-['']">
+                        {a.title}
+                      </Link>
+                    </h3>
+                  </div>
                   <div className="md:col-span-6">
                     <p className="text-ink-2">{a.description}</p>
                     <p className="mt-4 text-[0.8125rem] text-ink-3">{a.subs.map((s) => s.title).join(" · ")}</p>

@@ -83,9 +83,9 @@ throwing, and treats `{ success: false }` (suppressed recipient) as a failure.
 ## Feature groupings
 
 - `site/` — SiteLayout, Header (flyouts, mobile menu), Footer, PageHeader + Breadcrumbs, Section (Eyebrow, SectionHeader, Em), CTASection, Photo, Reveal, SearchDialog, LinkedInFeed, AnchorLink, ScrollManager, WhatsAppButton
-- `catalog/` — ProductLineCard, SpecTable, PackTable, EmptyColumnsTable, Badges (Family, Grade, Stage, New), ResinFinder + StageColumns, ResinChip, AddToQuote, CompareTray
+- `catalog/` — ProductLineCard, ProductFigure (+ ProductThumb, PackLineup: the picture of a product line), SpecTable, PackTable, EmptyColumnsTable, Badges (Family, Grade, Stage, New), ResinFinder + StageColumns, ResinChip, AddToQuote, CompareTray
 - `rfq/` — RFQDrawer, QuoteList, EnquiryForm
-- `viz/` — ColumnHero (animated hero), Halftone (family illustrations), GradeScale, Charts (LineChart, DataTable), Evidence (charts bound to `data/evidence.ts`), StatTile
+- `viz/` — ColumnHero (animated hero), Halftone (family illustrations), ProductIllustration (drawings for product lines without a picture), MoleculeGlyph (application pictograms), GradeScale, Charts (LineChart, DataTable), Evidence (charts bound to `data/evidence.ts`), StatTile
 - `brand/` — Logo, Dots
 - `docs/` — PasswordGate, MarkdownRenderer (with Mermaid support)
 - `ui/` — shadcn primitives (button, dialog, sheet, command, input, …)

@@ -8,9 +8,39 @@ import { Em, SectionHeader } from "@/components/site/Section";
 import { Button } from "@/components/ui/button";
 import { useRFQ } from "@/context/RFQContext";
 import { PACKING_CASE } from "@/data/evidence";
-import { PHOTOS } from "@/data/photos";
+import { PHOTOS, type PhotoAsset } from "@/data/photos";
 import { PACKING_OPTIONS, SERVICES, SERVICE_AUDIENCES, SERVICE_WORKFLOW } from "@/data/services";
 import { useSeo } from "@/lib/seo";
+import { cn } from "@/lib/utils";
+
+/* Pictures of the work, by service slug. `plate`: a cut-out on a white ground, shown on white. */
+const SERVICE_PHOTOS: Record<string, { photo: PhotoAsset; caption: string; plate?: boolean; sizes: string }> = {
+  "column-packing": {
+    photo: PHOTOS.packedColumnsTrio,
+    caption: "Packed columns at three scales",
+    plate: true,
+    sizes: "(min-width: 1024px) 17rem, 60vw",
+  },
+  "protein-purification": {
+    photo: PHOTOS.purificationRun,
+    caption: "The purification system in the applications laboratory, with a chromatogram on screen",
+    sizes: "(min-width: 1024px) 34vw, 100vw",
+  },
+};
+
+function ServicePicture({ slug }: { slug: string }) {
+  const picture = SERVICE_PHOTOS[slug];
+  if (!picture) return null;
+  return (
+    <Photo
+      photo={picture.photo}
+      sizes={picture.sizes}
+      caption={picture.caption}
+      className={cn("mt-10", picture.plate && "max-w-[17rem] [&>div]:bg-plate [&>div]:p-5")}
+      imgClassName={picture.plate ? "object-contain" : undefined}
+    />
+  );
+}
 
 export default function Services() {
   const { setOpen } = useRFQ();
@@ -97,6 +127,7 @@ export default function Services() {
                     label="Add to enquiry"
                   />
                 </div>
+                <ServicePicture slug={s.slug} />
               </div>
               <div className="lg:col-span-7">
                 <p className="max-w-2xl text-[1.0625rem] leading-relaxed text-ink-2">{s.description}</p>
@@ -154,15 +185,24 @@ export default function Services() {
             }
             lede={PACKING_CASE.learning}
           />
-          <div className="mt-12 grid gap-px overflow-hidden rounded-panel border border-rule bg-rule md:grid-cols-2">
-            {PACKING_CASE.cases.map((c) => (
-              <Reveal key={c.name} className="bg-card p-6 sm:p-8">
-                <p className="label text-ink-3">{c.name}</p>
-                <p className="numeral mt-3 text-[2.5rem]">{c.bed.split(" ").slice(0, 2).join(" ")}</p>
-                <p className="mt-1 text-[0.9375rem] text-ink-2">{c.bed.split(" ").slice(2).join(" ")}</p>
-                <p className="mt-5 border-t border-rule pt-5 text-lg font-medium leading-snug">{c.result}</p>
-              </Reveal>
-            ))}
+          <div className="mt-12 grid gap-6 lg:grid-cols-12">
+            <Photo
+              photo={PHOTOS.caseStudyColumn}
+              sizes="(min-width: 1024px) 30vw, 100vw"
+              caption="The packed column on the chromatography system. Photograph from the case study."
+              className="lg:col-span-4 [&>div]:aspect-[4/3] lg:[&>div]:aspect-[3/4]"
+              imgClassName="object-[center_35%]"
+            />
+            <div className="grid content-start gap-px self-start overflow-hidden rounded-panel border border-rule bg-rule lg:col-span-8">
+              {PACKING_CASE.cases.map((c) => (
+                <Reveal key={c.name} className="bg-card p-6 sm:p-8">
+                  <p className="label text-ink-3">{c.name}</p>
+                  <p className="numeral mt-3 text-[2.5rem]">{c.bed.split(" ").slice(0, 2).join(" ")}</p>
+                  <p className="mt-1 text-[0.9375rem] text-ink-2">{c.bed.split(" ").slice(2).join(" ")}</p>
+                  <p className="mt-5 border-t border-rule pt-5 text-lg font-medium leading-snug">{c.result}</p>
+                </Reveal>
+              ))}
+            </div>
           </div>
           <div className="mt-8 flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
             <p className="max-w-2xl text-[0.9375rem] text-ink-2">

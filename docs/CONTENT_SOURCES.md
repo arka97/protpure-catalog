@@ -2,7 +2,7 @@
 title: Content Sources
 description: Where every fact on the site comes from, and what is waiting for the client's confirmation
 phase: revamp 2026
-last_updated: 2026-10-02
+last_updated: 2026-10-03
 owner: Protpure engineering
 ---
 
@@ -31,6 +31,10 @@ All in the client's `Protpure/` folder.
 | Packing case study | `technical-data/2026-05_iec-column-efficiency_case-study.pdf` | May 2026 |
 | SEC poster | `technical-data/2026-04_sec-precise_calibration-poster.pdf` | Apr 2026 |
 | Hy-Ionic poster | `posters-social/Hy-ionic DP poster v2.png` | Oct 2026 |
+| MR kit overview | `posters-social/mr-agarose-kit_product-overview.png` | undated |
+| Pack images | `images/products/*.jpg`: 16 bottles, 500 × 500 px, with the label used in the 2025 catalogue | undated |
+| Photographs | `images/columns/`, `images/facility/` | undated |
+| Services pictures | `Services/` (added to the folder on 1 October 2026) | Oct 2026 |
 
 When two documents disagree, the site follows the newest one written for the website: the **product list**.
 
@@ -53,15 +57,37 @@ When two documents disagree, the site follows the newest one written for the web
 | `src/data/resources.ts` | Document list | The client's PDFs (titles, dates, page counts) |
 | `src/data/site.ts` | Contact details and address | 2026 brochures and datasheets |
 
-Photographs in `src/assets/img/` are the client's own, cropped and compressed:
+### Pictures
 
-| Site image | Original |
-| --- | --- |
-| `columns-box`, `columns-upright`, `columns-fan` | `images/columns/24*_fplc-prepacked-1ml-columns.jpg` |
-| `columns-pair` | `images/columns/23_ni-nta-agarose-1ml-columns.jpg` |
-| `packed-column` | `images/columns/ni-nta-agarose-packed-column_lab.jpg` |
-| `lab-fplc`, `lab-fplc-column` | `images/facility/fplc-system*.jpg` |
-| `bpg200-column` | `images/facility/bpg200-ni-nta-column_client-site.jpg` (camera watermark cropped out) |
+Every picture in `src/assets/img/` is the client's own: cropped, resized and compressed, and nothing else
+(the pack images are 500 px originals, so a copy enlarged to twice the size is served to high-density screens).
+`scripts/process-images.py` rebuilds the pictures added in October 2026 from the originals; it holds every crop box.
+
+| Site image | Original | Shown on |
+| --- | --- | --- |
+| `columns-box`, `columns-upright`, `columns-fan` | `images/columns/24*_fplc-prepacked-1ml-columns.jpg` | `columns-box`: Home and the Co-, Cu- and Zn-NTA pre-packed column pages. `columns-fan`: Company. `columns-upright` is not placed at present |
+| `columns-ni-pair` | `images/columns/23_ni-nta-agarose-1ml-columns.jpg` | Ni-NTA pre-packed columns |
+| `packed-column` | `images/columns/ni-nta-agarose-packed-column_lab.jpg` | Home, Ni-NTA Agarose |
+| `lab-fplc`, `lab-fplc-column` | `images/facility/fplc-system*.jpg` | Home, Services, Technology, Company |
+| `bpg200-column` | `images/facility/bpg200-ni-nta-column_client-site.jpg` (camera watermark cropped out) | Home, Ni-NTA Agarose, Company |
+| `pack-…` (8 lines) | `images/products/` 01, 03, 04, 10, 12, 14, 16, 19: the bottles whose label carries the name of a product line | Product pages, product cards, the catalogue header, Home |
+| `kit-mr-agarose` | MR kit overview, the product picture in its upper left | MR Agarose evaluation kit, Home |
+| `packed-columns-trio` | `Services/Pre-packed columns.png` | Services, column packing |
+| `purification-run` | `Services/Linkedin Cover image -1.png`, the photograph inside it (669 px wide; no larger original in the folder) | Services, protein purification |
+| `case-study-column` | The photograph on page 1 of the packing case study | Services, case study |
+| `beads-ff`, `beads-precise`, `beads-hr` | Intro deck, slides 20, 19 and 18 | Technology, performance grades |
+| `cover-…` (8 documents) | Page 1 of each PDF listed under Resources, 200 px wide | Resources |
+
+Drawn for the site, not taken from a client picture:
+
+- **Product illustrations** (`components/viz/ProductIllustration.tsx`) for the six lines without a usable picture:
+  Hy-Ionic DP, MR Agarose, Plain Agarose, Activated Agarose, the Ni-NTA His-tag kit and the empty columns.
+  Each shows the principle stated in that product's own text, and its caption says "Illustration".
+- **Application pictograms** (`components/viz/MoleculeGlyph.tsx`): the kind of molecule each application area
+  purifies. Decorative; no data.
+
+Which picture a product line gets is set in `src/data/product-visuals.ts`. `src/test/images.test.tsx` fails if a
+line has no picture, if a drawing is not captioned as one, or if a pack image is shown for a pack the line does not sell.
 
 The logo in `src/components/brand/Logo.tsx` is traced from `brand/protpure-logo.svg`. Its shapes and its two
 colours are unchanged.
@@ -112,6 +138,18 @@ Other figures:
 - **Evaluation samples** (offered on the datasheets): not offered on the site, by instruction.
 - **Delivery time "2–3 weeks"** (2025 catalogue), certificates of analysis, SDS: not stated on the site.
 - **Benchmark tables against an "industry standard"** (2025): not published.
+- **Pictures held back** (October 2026):
+  - The range photograph with eight 10 L containers (`images/products/product-portfolio_white-background.jpg`):
+    four containers are labelled "Faster", the packs are 10 L (the product list ends at 1 L), and the labels print
+    a Gmail address and the web address protpuretech.com.
+  - Pack images for products that are not in the product list: CM Agarose, CNBr-activated agarose, Ni-NTA magnetic
+    agarose. For the 4% and 6% agarose and the 2%, 4% and 6% cross-linked agarose bottles, see 3.5.
+  - The photograph of the manufacturing set-up in the intro deck (slide 5): 520 × 693 px, too small to show well.
+  - The gel on slide 12 of the intro deck (Ni-NTA purification, nine lanes): the slide names neither the protein
+    nor the conditions.
+  - `posters-social/2026-05_high-performance-resins_ai-concept.png`: a concept image, not a photograph of a product.
+  - The posters themselves, and the "metal binding / metal removal" strip in the MR kit LinkedIn poster (570 px wide).
+  - `Services/IMG_20260131_152243.jpg`: the same view as `fplc-system_1l-column.jpg`, which is already on the site.
 - **PDF downloads:** the documents are listed but sent on request. Several contain the conflicts above, and
   the product brochure has slips of its own (Q described for "basic" isoelectric points, "14 mmol",
   "1838.25 million plates"). Correct them, copy them to `public/downloads/`, then set `file` in `resources.ts`.
@@ -132,6 +170,40 @@ Other figures:
   Both must be read.
 - Single-source statements: "First Indian manufacturer of Ni-NTA Agarose" (brochures); "used in GMP facilities,
   with repeat orders", "600 L per month", "team of 8–10", "bootstrapped" (intro deck).
+
+### 3.5 Pictures
+
+- **Pack images.** The eight bottles shown carry the label of the 2025 catalogue: the "Protfiltr" name and a
+  wordmark with four dots. All are 500 mL bottles. Keep them, or send photographs of the current packs?
+- **Plain Agarose and Activated Agarose** show a drawing, because no pack image carries those names. The folder has
+  bottles labelled 4% and 6% agarose, and 2%, 4% and 6% cross-linked agarose. Which of them, if any, are the
+  current Plain Agarose and Activated Agarose?
+- **Hy-Ionic DP, MR Agarose, the Ni-NTA His-tag kit and the empty columns** have no picture in the folder and show
+  a drawing.
+- **MR Agarose evaluation kit.** The picture comes from the product overview poster. Does the kit that is shipped
+  look like it (the box, the bottle labels, the logo on the box)?
+- **Pre-packed columns.** The Co-, Cu- and Zn-NTA pages show the general photograph of the 1 mL columns and their
+  box; the columns in it are labelled for other resins. On the Ni-NTA page one of the two columns is labelled
+  "Ni-NTA Agarose Faster".
+- **Bead micrographs.** In the February 2026 deck the three matrices are called "Agarose" (mean 96 µm,
+  45–165 µm), "Agarose Precise" (60 µm, 25–110 µm) and "Agarose HR" (40 µm, 15–75 µm). The site shows them as
+  Fast Flow, Precise and High Resolution, without the deck's figures, because the product list gives ~90, ~70 and
+  ~35 µm. "Agarose" is read as Fast Flow because both have the particle range 45–165 µm. Confirm that the
+  pictures still stand for the current grades.
+- **Services.** "Packed columns at three scales": which column sizes are they? The photograph of the purification
+  system with the chromatogram exists only inside the LinkedIn cover, 669 px wide: please send the original.
+
+**Photographs wanted**, each on a plain light background, at least 2,000 px on the long side, unedited:
+
+1. One pack of each resin line with its current label: Hy-Ionic DP, MR Agarose, Plain Agarose and Activated
+   Agarose first, then the eight lines that now show the 2025 label.
+2. The Ni-NTA His-tag kit and the MR Agarose kit as shipped: the closed box, and the contents laid out.
+3. A 1 mL and a 5 mL pre-packed column side by side, and one column each of Co-, Cu- and Zn-NTA with its label readable.
+4. Empty columns: one of each diameter (16, 26 and 50 mm), a one-end and a both-ends adjustable column side by
+   side, and a close view of an adaptor.
+5. The manufacturing area and the quality-control bench, tidy and without people's faces unless they agree.
+6. The original files of pictures the site has only as small copies: the purification system with the
+   chromatogram on screen, and the three packed columns.
 
 ## 4. Removed from the previous site
 

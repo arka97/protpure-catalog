@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Download, FileText } from "lucide-react";
+import { Download } from "lucide-react";
 import { AddToQuote } from "@/components/catalog/AddToQuote";
 import { CTASection } from "@/components/site/CTASection";
 import { PageHeader } from "@/components/site/PageHeader";
@@ -72,8 +72,16 @@ export default function Resources() {
                         key={d.id}
                         className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-rule py-5"
                       >
-                        <div className="flex min-w-0 gap-4">
-                          <FileText aria-hidden className="mt-1 hidden h-5 w-5 shrink-0 text-ink-3 sm:block" />
+                        <div className="flex min-w-0 gap-4 sm:gap-5">
+                          <img
+                            src={d.cover.src}
+                            width={d.cover.width}
+                            height={d.cover.height}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                            className="mt-1 h-auto w-14 shrink-0 self-start rounded-[3px] border border-rule bg-plate sm:w-[4.5rem]"
+                          />
                           <div className="min-w-0">
                             <p className="text-lg font-semibold leading-snug tracking-tight">{d.title}</p>
                             <p className="mt-1 max-w-2xl text-[0.9375rem] text-ink-2">{d.description}</p>

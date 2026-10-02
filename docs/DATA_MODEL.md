@@ -2,7 +2,7 @@
 title: Data Model
 description: Tables, columns, enums, RLS policies, and relationships
 phase: production
-last_updated: 2026-10-02
+last_updated: 2026-10-03
 owner: Protpure engineering
 ---
 
@@ -22,13 +22,17 @@ The site does not read the `products` table below.
 | `applications.ts` | `Application[]` → `SubApplication[]` → `stages` | Each stage lists `ResinRef`s that link to a product (and grade) or a family |
 | `services.ts` | `Service[]` | SC001–SC004 |
 | `evidence.ts` | constants | Measured data behind the charts |
-| `resources.ts` | `Resource[]`, glossary | A resource with `file` downloads; without it, it is requested by enquiry |
+| `resources.ts` | `Resource[]`, glossary | A resource with `file` downloads; without it, it is requested by enquiry. `cover` is the first page as a thumbnail |
+| `photos.ts` | `Record<name, PhotoAsset>` | The client's photographs: two widths, intrinsic size, alt text |
+| `product-visuals.ts` | `Record<productSlug, ProductVisual>` | One picture per product line: `pack`, `photo` or `illustration`, with its caption |
 
 Quote-list items (`RFQItem` in `src/lib/enquiry.ts`) are keyed by catalogue number and have a `kind`:
 `product`, `hardware`, `service` or `document`.
 
 Integrity is checked by `src/test/catalog.test.ts`: counts match the client's sheets, catalogue numbers are
 unique, and every related product, featured product, document link and application recommendation resolves.
+`src/test/images.test.tsx` checks the pictures: every product line and application has one, every photograph is
+described, and a drawing is captioned as a drawing.
 
 ## Backend tables
 

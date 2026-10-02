@@ -2,7 +2,7 @@
 title: Design System
 description: Colour tokens, typography, layout patterns and chart rules of the 2026 identity
 phase: production
-last_updated: 2026-10-02
+last_updated: 2026-10-03
 owner: Protpure engineering
 ---
 
@@ -21,6 +21,7 @@ All colours are HSL triplets in CSS variables. Components use the Tailwind names
 | `paper-2` | `#EDEAE1` | Recessed panels, hover surfaces |
 | `rule` | `#D9D5C9` | Hairlines, card borders |
 | `card` | `#FFFFFF` | Cards, form fields |
+| `plate` | `#FFFFFF` | The ground under pack images and drawings. Stays white on dark sections, because the pack images have a white background |
 | `ink` | `#14132B` | Text, dark surfaces, primary buttons |
 | `ink-2` | `#4B4D62` | Secondary text (7.5:1 on paper) |
 | `ink-3` | `#62647A` | Captions, mono labels (5.3:1 on paper) |
@@ -97,6 +98,25 @@ All are pills. `AddToQuote` wraps `Button` and handles the "Added" state.
 - `ColumnHero` is the animated column and trace on the home page (CSS keyframes in `index.css`,
   paused off-screen, still frame under reduced motion).
 - Photographs are the client's own (`src/data/photos.ts`); use `Photo` so space is reserved and captions are consistent.
+
+### Product pictures
+
+Every product line has one picture, set in `src/data/product-visuals.ts`: the client's pack image, one of the
+client's photographs, or a drawing where the client has no picture.
+
+- `ProductFigure` is the large picture on a product page, with its caption. `ProductThumb` is the same picture at
+  card size (3:4, decorative: the product name stands beside it). `PackLineup` is the row of packs at the top of
+  the catalogue.
+- Pack images and drawings always stand on `plate`. Do not put a pack image on a tinted or dark surface.
+- `ProductIllustration` draws the principle of a product in its family colour: the bead surface, its ligands or
+  pores, and what they hold or let pass. On a product page its caption starts with "Illustration".
+- A caption says only what the picture shows ("500 mL pack"), never more than the catalogue supports.
+
+### Application pictograms
+
+`MoleculeGlyph` draws the kind of molecule each application area purifies, in the dots of the logo: indigo for the
+molecule, a lighter indigo for a second chain or domain, coral for the part the chromatography acts on.
+They are decorative (`aria-hidden`) and always stand next to the application's name.
 
 ## Charts
 

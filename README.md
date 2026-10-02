@@ -47,6 +47,7 @@ network requests: forms confirm without sending, and the documents hub, print an
 | `src/components/catalog/` | Product cards, specification and pack tables, resin finder, compare |
 | `src/components/rfq/` | Quote list, enquiry form, quote drawer |
 | `src/components/viz/` | Charts and illustrations (plain SVG, no chart library) |
+| `src/assets/img/` | The client's pictures as WebP, built by `scripts/process-images.py` |
 | `src/lib/enquiry.ts` | The one place that sends an enquiry |
 | `src/index.css`, `tailwind.config.ts` | Design tokens, see [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) |
 | `supabase/functions/` | Edge functions (Deno) |
@@ -59,6 +60,10 @@ Content is plain TypeScript, checked by the tests.
 - **A new product line:** add it to `src/data/catalog.ts` (and its packs to `packs.ts`).
   The products page, search, sitemap, CSV export and the quote list pick it up automatically.
 - **Application recommendations:** `src/data/applications.ts`.
+- **A product picture:** `src/data/product-visuals.ts` sets the picture of each product line: a pack image, a
+  photograph from `src/data/photos.ts`, or a drawing. To add a photograph from the client, add it to
+  `scripts/process-images.py` (crop and sizes), run the script, and point the product line at it. A new product
+  line must be given a picture: the tests fail without one.
 - **A document to download:** copy the PDF to `public/downloads/` and set `file` on its entry in
   `src/data/resources.ts`. Without `file`, the document is offered "on request".
 - Run `npm test` afterwards: it fails if a catalogue number is duplicated or a link points at a
@@ -72,6 +77,7 @@ Where every number on the site comes from, and what is still waiting for the cli
 1. The quote request is the only conversion path. No prices, no checkout.
 2. The site never offers samples (client instruction; a test enforces it).
 3. Only publish what a client document supports. If it is not in a source, it is not on the site.
+   The same goes for pictures: the client's own, or a drawing that is captioned as one.
 4. Units keep their case: `mL`, never `ML`. Use the `code` class, not `label`, for anything with a unit
    or a catalogue number.
 

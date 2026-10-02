@@ -4,8 +4,6 @@ import boxLg from "@/assets/img/columns-box-1600.webp";
 import boxSm from "@/assets/img/columns-box-880.webp";
 import fanLg from "@/assets/img/columns-fan-1100.webp";
 import fanSm from "@/assets/img/columns-fan-640.webp";
-import pairLg from "@/assets/img/columns-pair-1600.webp";
-import pairSm from "@/assets/img/columns-pair-880.webp";
 import uprightLg from "@/assets/img/columns-upright-1100.webp";
 import uprightSm from "@/assets/img/columns-upright-640.webp";
 import fplcLg from "@/assets/img/lab-fplc-1600.webp";
@@ -14,11 +12,27 @@ import fplcColumnLg from "@/assets/img/lab-fplc-column-1400.webp";
 import fplcColumnSm from "@/assets/img/lab-fplc-column-760.webp";
 import packedLg from "@/assets/img/packed-column-900.webp";
 import packedSm from "@/assets/img/packed-column-520.webp";
+import beadsFfLg from "@/assets/img/beads-ff-731.webp";
+import beadsFfSm from "@/assets/img/beads-ff-420.webp";
+import beadsHrLg from "@/assets/img/beads-hr-731.webp";
+import beadsHrSm from "@/assets/img/beads-hr-420.webp";
+import beadsPreciseLg from "@/assets/img/beads-precise-731.webp";
+import beadsPreciseSm from "@/assets/img/beads-precise-420.webp";
+import caseColumnLg from "@/assets/img/case-study-column-983.webp";
+import caseColumnSm from "@/assets/img/case-study-column-560.webp";
+import niPairLg from "@/assets/img/columns-ni-pair-1200.webp";
+import niPairSm from "@/assets/img/columns-ni-pair-640.webp";
+import mrKitLg from "@/assets/img/kit-mr-agarose-1068.webp";
+import mrKitSm from "@/assets/img/kit-mr-agarose-640.webp";
+import trioLg from "@/assets/img/packed-columns-trio-726.webp";
+import trioSm from "@/assets/img/packed-columns-trio-420.webp";
+import runLg from "@/assets/img/purification-run-669.webp";
 
 /*
-  The client's own photographs, cropped and compressed to WebP in two widths
-  (see docs/CONTENT_SOURCES.md for the original file names).
+  The client's own photographs and product visuals, cropped and compressed to WebP in two widths
+  (see docs/CONTENT_SOURCES.md for the original file names). Nothing is retouched.
   `width` and `height` are the intrinsic size of the large file, so the browser reserves the space before loading.
+  Pack images and document covers live in ./product-visuals.ts and ./resources.ts.
 */
 
 export interface PhotoAsset {
@@ -46,7 +60,6 @@ export const PHOTOS = {
     978,
     "A box of ProtPure pre-packed 1 mL FPLC columns with five columns standing in the tray and more laid out in front.",
   ),
-  columnsPair: photo(pairSm, 880, pairLg, 1600, 598, "Two ProtPure Ni-NTA Agarose 1 mL pre-packed columns."),
   columnsUpright: photo(
     uprightSm,
     640,
@@ -87,5 +100,62 @@ export const PHOTOS = {
     900,
     1779,
     "A glass laboratory column packed with Ni-NTA Agarose, seen from below the top adaptor.",
+  ),
+  columnsNiPair: photo(niPairSm, 640, niPairLg, 1200, 600, "Two ProtPure Ni-NTA Agarose 1 mL pre-packed columns."),
+  mrKit: photo(
+    mrKitSm,
+    640,
+    mrKitLg,
+    1068,
+    752,
+    "The MR Agarose evaluation kit: its box, a gravity column with a red cap and six labelled buffer bottles.",
+  ),
+  packedColumnsTrio: photo(
+    trioSm,
+    420,
+    trioLg,
+    726,
+    1108,
+    "Three packed chromatography columns side by side, from a slim laboratory column to a tall column about five times its height.",
+  ),
+  purificationRun: photo(
+    runLg,
+    669,
+    runLg,
+    669,
+    282,
+    "A protein purification system on the laboratory bench, with the chromatogram of the run on the monitor beside it.",
+  ),
+  caseStudyColumn: photo(
+    caseColumnSm,
+    560,
+    caseColumnLg,
+    983,
+    1344,
+    "A glass column packed with white agarose resin, mounted beside a protein purification system.",
+  ),
+  beadsFf: photo(
+    beadsFfSm,
+    420,
+    beadsFfLg,
+    731,
+    410,
+    "Micrograph of round agarose beads, Fast Flow grade. Many are wider than the 100 µm scale bar.",
+  ),
+  beadsPrecise: photo(
+    beadsPreciseSm,
+    420,
+    beadsPreciseLg,
+    731,
+    410,
+    "Micrograph of round agarose beads, Precise grade. Most are a little shorter than the 100 µm scale bar.",
+  ),
+  beadsHr: photo(
+    beadsHrSm,
+    420,
+    beadsHrLg,
+    731,
+    410,
+    "Micrograph of round agarose beads, High Resolution grade. Most are under half the 100 µm scale bar.",
   ),
 } as const;

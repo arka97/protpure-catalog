@@ -27,6 +27,7 @@ export default {
         /* Brand palette */
         paper: { DEFAULT: hsl("paper"), 2: hsl("paper-2") },
         rule: hsl("rule"),
+        plate: hsl("plate"),
         ink: {
           DEFAULT: hsl("ink"),
           2: hsl("ink-2"),

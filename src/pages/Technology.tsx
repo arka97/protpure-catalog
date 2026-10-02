@@ -21,13 +21,21 @@ import { StatTile } from "@/components/viz/StatTile";
 import { productsByFamily } from "@/data/catalog";
 import { CAPABILITIES } from "@/data/company";
 import { DEAE_PRECISE, IEX_COLUMN_TEST, SEC_CALIBRATION } from "@/data/evidence";
-import { familyById, RESIN_FAMILY_IDS } from "@/data/families";
-import { PHOTOS } from "@/data/photos";
+import { familyById, gradeById, RESIN_FAMILY_IDS } from "@/data/families";
+import { PHOTOS, type PhotoAsset } from "@/data/photos";
 import { FAMILY_STYLE } from "@/lib/family-style";
 import { useSeo } from "@/lib/seo";
 import { cn } from "@/lib/utils";
+import type { GradeId } from "@/types/catalog";
 
 const section = "py-20 md:py-28";
+
+/* Micrographs from the client's February 2026 technical presentation, in the order of the grade scale. */
+const MICROGRAPHS: { grade: GradeId; photo: PhotoAsset }[] = [
+  { grade: "ff", photo: PHOTOS.beadsFf },
+  { grade: "precise", photo: PHOTOS.beadsPrecise },
+  { grade: "hr", photo: PHOTOS.beadsHr },
+];
 
 /* Heading for one data set inside the "Performance data" section. */
 function Study({
@@ -213,6 +221,34 @@ export default function Technology() {
           />
           <Reveal className="mt-12 lg:mt-16">
             <GradeScale />
+          </Reveal>
+
+          <Reveal as="figure" className="mt-14 md:mt-20">
+            <h3 className="heading-4">The same three grades, under the microscope</h3>
+            <div className="mt-6 grid gap-x-4 gap-y-6 md:grid-cols-3">
+              {MICROGRAPHS.map((m) => (
+                <div key={m.grade}>
+                  <div className="overflow-hidden rounded-panel bg-paper-2">
+                    <img
+                      src={m.photo.src}
+                      srcSet={m.photo.srcSet}
+                      sizes="(min-width: 768px) 30vw, 100vw"
+                      width={m.photo.width}
+                      height={m.photo.height}
+                      alt={m.photo.alt}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-auto w-full"
+                    />
+                  </div>
+                  <p className="mt-3 font-semibold">{gradeById(m.grade).name}</p>
+                </div>
+              ))}
+            </div>
+            <figcaption className="mt-4 max-w-3xl text-[0.8125rem] text-ink-3">
+              Micrographs of the agarose base matrix, from our February 2026 technical presentation. The yellow scale
+              bar in each picture is 100 µm.
+            </figcaption>
           </Reveal>
         </div>
       </section>

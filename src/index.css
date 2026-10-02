@@ -59,6 +59,7 @@
     --paper: 45 31% 95%; /* #F6F4EE  page background */
     --paper-2: 45 25% 91%; /* #EDEAE1  recessed panels */
     --rule: 45 17% 82%; /* #D9D5C9  hairlines */
+    --plate: 0 0% 100%; /* #FFFFFF  ground under pack images; stays white on dark surfaces */
 
     /* Text */
     --ink: 243 39% 12%; /* #14132B  primary text, dark surfaces */
