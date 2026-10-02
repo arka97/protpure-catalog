@@ -37,6 +37,7 @@ export default {
         "on-ink": { DEFAULT: hsl("on-ink"), 2: hsl("on-ink-2") },
         brand: { DEFAULT: hsl("brand"), dot: hsl("brand-dot") },
         signal: { DEFAULT: hsl("signal"), ink: hsl("signal-ink") },
+        whatsapp: { DEFAULT: hsl("whatsapp"), foreground: hsl("whatsapp-foreground") },
 
         /* Chromatography families */
         imac: { DEFAULT: hsl("imac"), tint: hsl("imac-tint") },
