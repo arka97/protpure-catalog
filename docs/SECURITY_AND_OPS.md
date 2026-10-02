@@ -2,7 +2,7 @@
 title: Security and Ops
 description: Auth, RLS, secrets, queue ops, deploy, and exports
 phase: production
-last_updated: 2026-10-02
+last_updated: 2026-10-03
 owner: Protpure engineering
 ---
 
@@ -26,7 +26,7 @@ There is no Supabase Auth user, no OAuth provider, no email/password flow — ad
 | `preview-transactional-email` | false | Renders templates only, no side effects |
 | `handle-email-unsubscribe` | false | Idempotent token redemption |
 | `handle-email-suppression` | false | Verifies Resend webhook signature inside |
-| `linkedin-company-feed` | false | Read-only outbound fetch, cached |
+| `linkedin-company-feed` | false | Read-only outbound fetch, cached. No longer called by the site (2026-10); delete it through Lovable |
 | `send-transactional-email` | true | Requires the anon JWT, an allowed `Origin` (protpure.com, www.protpure.com, `*.lovable.app`, `*.lovable.dev`) and stays under 5 requests per minute per IP |
 | `process-email-queue` | true | Called by cron with the service-role Bearer from vault |
 

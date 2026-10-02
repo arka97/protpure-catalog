@@ -81,6 +81,9 @@ Rules:
 - Inner pages start with `PageHeader` (breadcrumb, eyebrow, `h1`, lede, optional aside).
 - Detail pages use a margin column: label + heading on 3 columns, content on 9.
 - A section that is the target of a `#link` needs only an `id`: the offset for the sticky header is global.
+- Header: the full menu (`src/data/nav.ts`, seven items) shows from `xl` (1280 px). Narrower windows get the
+  menu button, which opens the same list. The search field shows its label from 1340 px. A new menu item or a
+  longer label needs the header measured again at 1280 and 1340 px: at 1340 px about 40 px are free.
 - Radii: `rounded-panel` (1.75 rem) for cards and panels, `rounded-lg` for small boxes, pills for buttons and chips.
 - Tables are hairline tables: a dark top rule, light row rules, no zebra.
 - Every page ends with `CTASection` (the coral band), except Contact and Quote.

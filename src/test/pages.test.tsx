@@ -3,6 +3,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import App from "@/App";
 import { APPLICATIONS } from "@/data/applications";
 import { PRODUCTS } from "@/data/catalog";
+import { supabase } from "@/integrations/supabase/client";
 
 /*
   Smoke test: every route renders its own <h1> without throwing.
@@ -10,9 +11,7 @@ import { PRODUCTS } from "@/data/catalog";
 */
 
 vi.mock("@/integrations/supabase/client", () => ({
-  supabase: {
-    functions: { invoke: vi.fn().mockResolvedValue({ data: { source: "fallback", posts: [] }, error: null }) },
-  },
+  supabase: { functions: { invoke: vi.fn() } },
 }));
 
 beforeAll(() => {
@@ -76,5 +75,21 @@ describe("pages", () => {
     const h1 = await visit("/procurement");
     expect(h1.textContent).toMatch(/chromatography resin platform\./);
     expect(window.location.pathname).toBe("/about");
+  });
+
+  it("has Contact in the main menu, and once among the footer links", async () => {
+    await visit("/");
+    const menu = screen.getByRole("navigation", { name: "Main" });
+    expect(within(menu).getByRole("link", { name: "Contact" })).toHaveAttribute("href", "/contact");
+    const footer = screen.getByRole("navigation", { name: "Site" });
+    expect(within(footer).getAllByRole("link", { name: "Contact" })).toHaveLength(1);
+  });
+
+  it("opens the contact page without a request to the backend", async () => {
+    vi.mocked(supabase.functions.invoke).mockClear();
+    await visit("/contact");
+    // Anything the page asked for on arrival would have gone out by now.
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(supabase.functions.invoke).not.toHaveBeenCalled();
   });
 });

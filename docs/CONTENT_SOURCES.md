@@ -56,6 +56,7 @@ When two documents disagree, the site follows the newest one written for the web
 | `src/data/company.ts` | Facts, milestones, vision, mission, founder quote | Intro deck, executive and short brochures |
 | `src/data/resources.ts` | Document list | The client's PDFs (titles, dates, page counts) |
 | `src/data/site.ts` | Contact details and address | 2026 brochures and datasheets |
+| `src/data/linkedin-posts.ts` | LinkedIn posts on the Contact page | The company's LinkedIn page, copied post by post with the link to each |
 
 ### Pictures
 

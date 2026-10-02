@@ -5,8 +5,8 @@ resins, pre-packed columns, kits, empty columns and downstream bioprocessing ser
 Every page leads to one action: a quote request that is emailed to the sales inbox.
 
 - **Stack:** Vite 5, React 18, TypeScript, Tailwind CSS 3, shadcn/ui (Radix), React Router 6.
-- **Backend:** Lovable Cloud (Supabase) edge functions for email, the LinkedIn feed and the
-  password-protected documents portal. The catalogue itself is static data in `src/data`.
+- **Backend:** Lovable Cloud (Supabase) edge functions for email and the password-protected
+  documents portal. The catalogue itself is static data in `src/data`.
 - **Docs:** start at [`docs/MASTER_INDEX.md`](docs/MASTER_INDEX.md).
 
 ## Run it
@@ -66,6 +66,9 @@ Content is plain TypeScript, checked by the tests.
   line must be given a picture: the tests fail without one.
 - **A document to download:** copy the PDF to `public/downloads/` and set `file` on its entry in
   `src/data/resources.ts`. Without `file`, the document is offered "on request".
+- **A LinkedIn post on the Contact page:** add its link, date and text to `src/data/linkedin-posts.ts`.
+  The page shows the three newest and no posts section while the list is empty. The site cannot fetch
+  posts itself: LinkedIn gives a company page's posts only to developer apps it has approved.
 - Run `npm test` afterwards: it fails if a catalogue number is duplicated or a link points at a
   product that does not exist.
 
@@ -86,7 +89,7 @@ Where every number on the site comes from, and what is still waiting for the cli
 | Variable | Purpose |
 | --- | --- |
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, `VITE_SUPABASE_PROJECT_ID` | Backend (managed by Lovable Cloud, in `.env`) |
-| `VITE_ENQUIRY_DEMO=true` | Forms confirm without sending; the LinkedIn feed is not requested. For local click-throughs |
+| `VITE_ENQUIRY_DEMO=true` | Forms confirm without sending. For local click-throughs |
 | `VITE_PREVIEW=true` | Set by `npm run build:preview`: in-memory routing, demo mode, no downloads, print or backend pages |
 
 ## Hosting
