@@ -23,7 +23,7 @@ const ALLOWED_ORIGINS = [
   "https://www.protpure.com",
   "https://protpure.lovable.app",
 ]
-const ALLOWED_ORIGIN_SUFFIXES = [".lovable.app", ".lovable.dev"]
+const ALLOWED_ORIGIN_SUFFIXES = [".lovable.app", ".lovable.dev", ".lovableproject.com"]
 
 // Simple in-memory IP rate limiter (per-instance). Caps abusive bursts
 // from a single IP. Not a substitute for a global limiter but sufficient
