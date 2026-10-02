@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { FamilyBadge, NewTag } from "@/components/catalog/Badges";
+import { ProductThumb } from "@/components/catalog/ProductFigure";
 import { ResinFinder } from "@/components/catalog/ResinFinder";
 import { CTASection } from "@/components/site/CTASection";
 import { Photo } from "@/components/site/Photo";
@@ -11,6 +12,7 @@ import { ColumnHero } from "@/components/viz/ColumnHero";
 import { EfficiencyChart, EfficiencyTable } from "@/components/viz/Evidence";
 import { GradeScale } from "@/components/viz/GradeScale";
 import { Halftone } from "@/components/viz/Halftone";
+import { ProductIllustration } from "@/components/viz/ProductIllustration";
 import { StatTile } from "@/components/viz/StatTile";
 import { useRFQ } from "@/context/RFQContext";
 import { APPLICATIONS } from "@/data/applications";
@@ -25,7 +27,7 @@ import { SITE } from "@/data/site";
 import { FAMILY_STYLE } from "@/lib/family-style";
 import { useSeo } from "@/lib/seo";
 import { cn } from "@/lib/utils";
-import type { Product } from "@/types/catalog";
+import type { FamilyId, Product } from "@/types/catalog";
 
 const section = "py-20 md:py-28";
 
@@ -117,6 +119,16 @@ function ProofStrip() {
 
 /* ------------------------------------------------------------------ Portfolio */
 
+/* The product line whose picture stands for each chemistry on the home page. */
+const FAMILY_PICTURE: Partial<Record<FamilyId, string>> = {
+  imac: "ni-nta-agarose",
+  iex: "sp-agarose",
+  hic: "phenyl-agarose",
+  mixed: "hy-ionic-dp",
+  mrc: "mr-agarose",
+  sec: "plain-agarose",
+};
+
 function FamilyTile({ id, index }: { id: (typeof RESIN_FAMILY_IDS)[number]; index: number }) {
   const family = familyById(id);
   const style = FAMILY_STYLE[family.color];
@@ -135,7 +147,8 @@ function FamilyTile({ id, index }: { id: (typeof RESIN_FAMILY_IDS)[number]; inde
         className="pointer-events-none absolute -right-8 -top-8 -z-10 h-52 w-52 origin-top-right transition-transform duration-700 group-hover:scale-105"
       />
       <p className="label text-ink-2">{family.abbr}</p>
-      <h3 className="heading-4 mt-auto pt-40">
+      <ProductThumb slug={FAMILY_PICTURE[id] ?? ""} className="mt-5 w-[5.5rem]" />
+      <h3 className="heading-4 mt-auto pt-8">
         <Link to={`/products?family=${id}`} className="after:absolute after:inset-0 after:content-['']">
           {family.name}
         </Link>
@@ -215,32 +228,50 @@ function Portfolio() {
           <Reveal
             as="article"
             delay={70}
-            className="group relative flex flex-col rounded-panel border border-rule bg-card p-6 sm:p-7 lg:col-span-3"
+            className="group relative flex flex-col overflow-hidden rounded-panel border border-rule bg-card lg:col-span-3"
           >
-            <FamilyBadge family="kits" />
-            <h3 className="heading-4 mt-auto pt-10">
-              <Link to="/products?family=kits" className="after:absolute after:inset-0 after:content-['']">
-                Kits
-              </Link>
-            </h3>
-            <p className="mt-2 text-[0.9375rem] leading-snug text-ink-2">
-              His-tag purification and metal-removal evaluation kits, ten reactions each.
-            </p>
+            <img
+              src={PHOTOS.mrKit.src}
+              srcSet={PHOTOS.mrKit.srcSet}
+              sizes="(min-width: 1024px) 25vw, 100vw"
+              width={PHOTOS.mrKit.width}
+              height={PHOTOS.mrKit.height}
+              alt={PHOTOS.mrKit.alt}
+              loading="lazy"
+              decoding="async"
+              className="h-44 w-full object-cover object-[center_70%]"
+            />
+            <div className="flex flex-1 flex-col p-6 sm:p-7">
+              <FamilyBadge family="kits" />
+              <h3 className="heading-4 mt-auto pt-6">
+                <Link to="/products?family=kits" className="after:absolute after:inset-0 after:content-['']">
+                  Kits
+                </Link>
+              </h3>
+              <p className="mt-2 text-[0.9375rem] leading-snug text-ink-2">
+                His-tag purification and metal-removal evaluation kits, ten reactions each.
+              </p>
+            </div>
           </Reveal>
           <Reveal
             as="article"
             delay={140}
-            className="group relative flex flex-col rounded-panel border border-rule bg-card p-6 sm:p-7 lg:col-span-3"
+            className="group relative flex flex-col overflow-hidden rounded-panel border border-rule bg-card lg:col-span-3"
           >
-            <FamilyBadge family="hardware" />
-            <h3 className="heading-4 mt-auto pt-10">
-              <Link to="/products/empty-columns" className="after:absolute after:inset-0 after:content-['']">
-                Empty columns
-              </Link>
-            </h3>
-            <p className="mt-2 text-[0.9375rem] leading-snug text-ink-2">
-              {EMPTY_COLUMNS.length} adjustable glass columns, 16 to 50 mm inner diameter.
-            </p>
+            <div className="h-44 bg-paper-2 py-4">
+              <ProductIllustration id="empty-columns" decorative className="mx-auto h-full w-auto" />
+            </div>
+            <div className="flex flex-1 flex-col p-6 sm:p-7">
+              <FamilyBadge family="hardware" />
+              <h3 className="heading-4 mt-auto pt-6">
+                <Link to="/products/empty-columns" className="after:absolute after:inset-0 after:content-['']">
+                  Empty columns
+                </Link>
+              </h3>
+              <p className="mt-2 text-[0.9375rem] leading-snug text-ink-2">
+                {EMPTY_COLUMNS.length} adjustable glass columns, 16 to 50 mm inner diameter.
+              </p>
+            </div>
           </Reveal>
         </div>
       </div>
@@ -370,16 +401,21 @@ function FeatureCard({ product, delay }: { product: Product; delay: number }) {
         <FamilyBadge family={product.family} />
         {product.isNew && <NewTag />}
       </div>
-      <h3 className="mt-8 text-xl font-semibold leading-tight tracking-tight">
-        <Link
-          to={`/products/${product.slug}`}
-          className="after:absolute after:inset-0 after:rounded-panel after:content-['']"
-        >
-          {product.name}
-        </Link>
-      </h3>
-      <p className="mt-1.5 text-[0.9375rem] text-ink-2">{product.descriptor}</p>
-      <p className="mt-auto flex items-end justify-between gap-3 pt-8 text-[0.8125rem] text-ink-2">
+      <div className="mt-6 flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h3 className="text-xl font-semibold leading-tight tracking-tight">
+            <Link
+              to={`/products/${product.slug}`}
+              className="after:absolute after:inset-0 after:rounded-panel after:content-['']"
+            >
+              {product.name}
+            </Link>
+          </h3>
+          <p className="mt-1.5 text-[0.9375rem] text-ink-2">{product.descriptor}</p>
+        </div>
+        <ProductThumb slug={product.slug} className="w-16 border border-rule" />
+      </div>
+      <p className="mt-auto flex items-end justify-between gap-3 pt-6 text-[0.8125rem] text-ink-2">
         <span>{product.highlights[0]}</span>
         <ArrowUpRight
           aria-hidden

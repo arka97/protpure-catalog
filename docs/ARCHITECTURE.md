@@ -70,6 +70,7 @@ Stored in Lovable Cloud secret store; never shipped to the browser.
 ├── docs/                       (this handover pack)
 ├── public/                     favicon set, og-image.png, robots.txt  (sitemap.xml is generated at build)
 ├── scripts/build-preview.mjs   Single-file offline preview (npm run build:preview)
+├── scripts/process-images.py   Builds src/assets/img from the client's originals (Python, run by hand)
 ├── src/
 │   ├── App.tsx                 Routes + provider stack
 │   ├── main.tsx                Entry
@@ -82,12 +83,13 @@ Stored in Lovable Cloud secret store; never shipped to the browser.
 │   │   ├── catalog/            ProductLineCard, SpecTable, PackTable, EmptyColumnsTable, Badges,
 │   │   │                       ResinFinder, ResinChip, AddToQuote, CompareTray
 │   │   ├── rfq/                RFQDrawer, QuoteList, EnquiryForm
-│   │   ├── viz/                ColumnHero, Halftone, GradeScale, Charts, Evidence, StatTile
+│   │   ├── viz/                ColumnHero, Halftone, GradeScale, Charts, Evidence, StatTile,
+│   │   │                       ProductIllustration, MoleculeGlyph
 │   │   ├── docs/               PasswordGate, MarkdownRenderer
 │   │   └── ui/                 shadcn primitives
 │   ├── context/                RFQContext, CompareContext, DocAuthContext
 │   ├── data/                   catalog, packs, hardware, families, applications, services,
-│   │                           evidence, company, resources, photos, site, nav
+│   │                           evidence, company, resources, photos, product-visuals, site, nav
 │   ├── hooks/                  useDocs, use-toast, use-mobile
 │   ├── integrations/supabase/  client.ts, types.ts (auto-generated)
 │   ├── lib/                    enquiry, seo, sci, catalog-helpers, catalog-export, download,

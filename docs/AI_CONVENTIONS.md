@@ -2,7 +2,7 @@
 title: AI Conventions
 description: Guardrails, anti-patterns, and decision records for future AI sessions
 phase: production
-last_updated: 2026-10-02
+last_updated: 2026-10-03
 owner: Protpure engineering
 ---
 
@@ -17,6 +17,7 @@ Rules for any agent (human or AI) editing this codebase. These are not suggestio
 - **One sender.** `submitEnquiry` in `src/lib/enquiry.ts` is the only code that calls `send-transactional-email`. A form may show a confirmation only after it returns `{ ok: true }`; on failure it must offer the email / WhatsApp fallback.
 - **No samples.** The site never offers samples, free or otherwise (client instruction). `src/test/catalog.test.ts` fails if such wording appears.
 - **Sourced content only.** Every number and claim must be traceable to a client document listed in `docs/CONTENT_SOURCES.md`. If the documents disagree, follow the product list and record the conflict there. Never invent placeholder data, posts, downloads or file sizes.
+- **Sourced pictures only.** A picture is the client's own (listed in `docs/CONTENT_SOURCES.md`) or a drawing made for the site and captioned "Illustration". No stock photographs, no generated product pictures, no retouching beyond crop, resize and compression. A pack image is shown only for the product line named on its label.
 - **No end-user auth.** Adding sign-up/login requires an explicit user decision; it isn't free — it changes RLS, edge-function gating, and content strategy.
 - **Never edit** `src/integrations/supabase/client.ts`, `src/integrations/supabase/types.ts`, `.env`, or `supabase/config.toml` project-level settings. They are auto-generated.
 
@@ -29,6 +30,7 @@ Rules for any agent (human or AI) editing this codebase. These are not suggestio
 - **shadcn/ui first.** Prefer extending existing primitives over hand-rolled components.
 - **Mobile-first responsive.** Use Tailwind breakpoints; every page must be usable at 360px width.
 - **Preserve dark-mode compatibility** in every color choice.
+- **Pack images and drawings stand on `plate`** (white on every surface), through `ProductFigure` / `ProductThumb`. Photographs go through `Photo`.
 
 ## Backend rules
 

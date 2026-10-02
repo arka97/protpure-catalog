@@ -4,6 +4,7 @@ import { Download, LayoutGrid, List, Search, X } from "lucide-react";
 import { AddToQuote } from "@/components/catalog/AddToQuote";
 import { FamilyBadge, GradeBadge } from "@/components/catalog/Badges";
 import { EmptyColumnsTable } from "@/components/catalog/EmptyColumnsTable";
+import { PackLineup } from "@/components/catalog/ProductFigure";
 import { ProductLineCard } from "@/components/catalog/ProductLineCard";
 import { CTASection } from "@/components/site/CTASection";
 import { PageHeader } from "@/components/site/PageHeader";
@@ -130,6 +131,7 @@ export default function Products() {
           </>
         }
         lede={`${PRODUCTS.length} product lines and ${CATALOGUE_COUNT} catalogue items, from 1 mL pre-packed columns to 1 L packs of resin. Add what you need to your quote list and send it in one request.`}
+        aside={<PackLineup />}
       />
 
       {/* Filters */}

@@ -1,3 +1,12 @@
+import coverCompanyBrochure from "@/assets/img/cover-company-brochure-200.webp";
+import coverCsColumnPacking from "@/assets/img/cover-cs-column-packing-200.webp";
+import coverDsDeae from "@/assets/img/cover-ds-deae-agarose-200.webp";
+import coverDsQ from "@/assets/img/cover-ds-q-agarose-200.webp";
+import coverDsSp from "@/assets/img/cover-ds-sp-agarose-200.webp";
+import coverProductBrochure from "@/assets/img/cover-product-brochure-200.webp";
+import coverTnDeae from "@/assets/img/cover-tn-deae-precise-200.webp";
+import coverTnSec from "@/assets/img/cover-tn-sec-calibration-200.webp";
+
 /*
   Documents offered on the Resources page.
 
@@ -19,6 +28,8 @@ export interface Resource {
   /** Related product slugs, used to list documents on product pages. */
   products: string[];
   file?: string;
+  /** The document's first page at thumbnail size (200 px wide: the text on it cannot be read). */
+  cover: { src: string; width: number; height: number };
 }
 
 export const RESOURCES: Resource[] = [
@@ -31,6 +42,7 @@ export const RESOURCES: Resource[] = [
     issued: "August 2026",
     pages: 8,
     products: [],
+    cover: { src: coverProductBrochure, width: 200, height: 283 },
   },
   {
     id: "company-brochure",
@@ -40,6 +52,7 @@ export const RESOURCES: Resource[] = [
     issued: "June 2026",
     pages: 6,
     products: [],
+    cover: { src: coverCompanyBrochure, width: 200, height: 200 },
   },
   {
     id: "ds-sp-agarose",
@@ -49,6 +62,7 @@ export const RESOURCES: Resource[] = [
     issued: "May 2026 · Rev 1.0",
     pages: 1,
     products: ["sp-agarose"],
+    cover: { src: coverDsSp, width: 200, height: 283 },
   },
   {
     id: "ds-q-agarose",
@@ -58,6 +72,7 @@ export const RESOURCES: Resource[] = [
     issued: "May 2026 · Rev 1.0",
     pages: 1,
     products: ["q-agarose"],
+    cover: { src: coverDsQ, width: 200, height: 283 },
   },
   {
     id: "ds-deae-agarose",
@@ -67,6 +82,7 @@ export const RESOURCES: Resource[] = [
     issued: "May 2026 · Rev 1.0",
     pages: 1,
     products: ["deae-agarose"],
+    cover: { src: coverDsDeae, width: 200, height: 283 },
   },
   {
     id: "tn-deae-precise",
@@ -77,6 +93,7 @@ export const RESOURCES: Resource[] = [
     issued: "May 2026",
     pages: 9,
     products: ["deae-agarose"],
+    cover: { src: coverTnDeae, width: 200, height: 150 },
   },
   {
     id: "tn-sec-calibration",
@@ -86,6 +103,7 @@ export const RESOURCES: Resource[] = [
     issued: "April 2026",
     pages: 1,
     products: ["plain-agarose", "activated-agarose"],
+    cover: { src: coverTnSec, width: 200, height: 283 },
   },
   {
     id: "cs-column-packing",
@@ -95,6 +113,7 @@ export const RESOURCES: Resource[] = [
     issued: "May 2026",
     pages: 8,
     products: [],
+    cover: { src: coverCsColumnPacking, width: 200, height: 150 },
   },
 ];
 

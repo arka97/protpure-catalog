@@ -5,6 +5,7 @@ import { StageColumns } from "@/components/catalog/ResinFinder";
 import { CTASection } from "@/components/site/CTASection";
 import { PageHeader } from "@/components/site/PageHeader";
 import { Button } from "@/components/ui/button";
+import { MoleculeGlyph } from "@/components/viz/MoleculeGlyph";
 import { APPLICATIONS, applicationBySlug, type Application } from "@/data/applications";
 import { PRODUCTS } from "@/data/catalog";
 import { useSeo } from "@/lib/seo";
@@ -54,6 +55,11 @@ function Detail({ app }: { app: Application }) {
               <Link to="/services#resin-screening">Resin screening service</Link>
             </Button>
           </>
+        }
+        aside={
+          <div className="dotgrid grid place-items-center rounded-panel border border-rule bg-card p-8 sm:p-10">
+            <MoleculeGlyph slug={app.slug} className="h-44 w-44 sm:h-56 sm:w-56" />
+          </div>
         }
       />
 

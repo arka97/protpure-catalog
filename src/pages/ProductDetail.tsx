@@ -6,6 +6,7 @@ import { AddToQuote } from "@/components/catalog/AddToQuote";
 import { FamilyBadge, GradeBadge, NewTag, StageBadges } from "@/components/catalog/Badges";
 import { EmptyColumnsTable } from "@/components/catalog/EmptyColumnsTable";
 import { PackTable } from "@/components/catalog/PackTable";
+import { ProductFigure } from "@/components/catalog/ProductFigure";
 import { ProductLineCard } from "@/components/catalog/ProductLineCard";
 import { SpecTable } from "@/components/catalog/SpecTable";
 import { AnchorLink } from "@/components/site/AnchorLink";
@@ -21,6 +22,7 @@ import { productBySlug } from "@/data/catalog";
 import { DEAE_PRECISE } from "@/data/evidence";
 import { familyById } from "@/data/families";
 import { PHOTOS } from "@/data/photos";
+import { visualForProduct } from "@/data/product-visuals";
 import { resourcesForProduct } from "@/data/resources";
 import { SITE } from "@/data/site";
 import { variantHeadline } from "@/lib/catalog-helpers";
@@ -124,17 +126,6 @@ const EVIDENCE: Record<string, { label: string; title: string; content: ReactNod
       </div>
     ),
   },
-  "ni-nta-prepacked-columns": {
-    label: "The columns",
-    title: "Ready to connect",
-    content: (
-      <Photo
-        photo={PHOTOS.columnsPair}
-        sizes="(min-width: 1024px) 60vw, 100vw"
-        caption="Ni-NTA Agarose 1 mL pre-packed columns"
-      />
-    ),
-  },
 };
 
 /* ------------------------------------------------------------------ Page */
@@ -151,6 +142,7 @@ function Detail({ product }: { product: Product }) {
   const documents = resourcesForProduct(product.slug);
   const related = product.related.map((s) => productBySlug(s)).filter((p): p is Product => Boolean(p));
   const evidence = EVIDENCE[product.slug];
+  const visual = visualForProduct(product.slug);
   const glance = product.variants.map((v) => ({ variant: v, headline: variantHeadline(v) })).filter((g) => g.headline);
   const isHardware = product.kind === "hardware";
   const secData = product.family === "sec";
@@ -225,9 +217,11 @@ function Detail({ product }: { product: Product }) {
             </div>
           </div>
 
+          {/* On the printed datasheet the picture stands beside the figures, so page one keeps its length. */}
           <aside
             className={cn(
               "relative isolate self-start overflow-hidden rounded-panel p-6 sm:p-8 lg:col-span-5",
+              visual && "print:grid print:grid-cols-[9.5rem_1fr] print:gap-x-6",
               style.tint,
             )}
             aria-label="At a glance"
@@ -235,10 +229,11 @@ function Detail({ product }: { product: Product }) {
             <Halftone
               family={product.family}
               cells={13}
-              className="pointer-events-none absolute -right-8 -top-8 -z-10 h-56 w-56"
+              className={cn("pointer-events-none absolute -right-8 -top-8 -z-10 h-56 w-56", visual && "print:hidden")}
             />
-            <p className="label text-ink-2">{family.abbr} · At a glance</p>
-            <div className="mt-44">
+            <p className="label text-ink-2 print:col-span-2">{family.abbr} · At a glance</p>
+            {visual && <ProductFigure visual={visual} priority className="mt-6 print:mt-4" />}
+            <div className={visual ? "mt-6 print:mt-4" : "mt-44"}>
               {glance.length > 0 ? (
                 <ul className="divide-y divide-ink/15 border-y border-ink/15">
                   {glance.map(({ variant, headline }) => (

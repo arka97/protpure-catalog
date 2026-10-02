@@ -6,6 +6,7 @@ import { packRange, variantHeadline } from "@/lib/catalog-helpers";
 import { cn } from "@/lib/utils";
 import type { Product } from "@/types/catalog";
 import { FamilyBadge, GradeBadge, NewTag } from "./Badges";
+import { ProductThumb } from "./ProductFigure";
 
 interface ProductLineCardProps {
   product: Product;
@@ -34,15 +35,21 @@ export function ProductLineCard({ product, as: H = "h3", compact, className }: P
         {product.isNew && <NewTag />}
       </div>
 
-      <H className="heading-4 mt-5">
-        <Link
-          to={`/products/${product.slug}`}
-          className="after:absolute after:inset-0 after:rounded-panel after:content-['']"
-        >
-          {product.name}
-        </Link>
-      </H>
-      <p className="mt-1.5 text-[0.9375rem] font-medium text-ink-2">{product.descriptor}</p>
+      <div className="mt-5 flex items-start justify-between gap-4">
+        {/* On the narrowest phones the picture gives way to the name; a long word breaks before it widens the page. */}
+        <div className="min-w-0 [overflow-wrap:anywhere]">
+          <H className="heading-4">
+            <Link
+              to={`/products/${product.slug}`}
+              className="after:absolute after:inset-0 after:rounded-panel after:content-['']"
+            >
+              {product.name}
+            </Link>
+          </H>
+          <p className="mt-1.5 text-[0.9375rem] font-medium text-ink-2">{product.descriptor}</p>
+        </div>
+        <ProductThumb slug={product.slug} className="-mt-1 w-14 border border-rule max-[339px]:hidden xs:w-[4.5rem]" />
+      </div>
 
       {!compact && <p className="mt-4 text-[0.9375rem] leading-relaxed text-ink-2">{product.summary}</p>}
 
