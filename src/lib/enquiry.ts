@@ -5,7 +5,7 @@ import { DEMO } from "./env";
   The enquiry (RFQ) pipeline, client side.
 
   Every enquiry on the site ends here: the quote list, the service form and the contact form all call
-  `submitEnquiry`, which posts to the existing `send-transactional-email` edge function. The payload shapes
+  `submitEnquiry`, which posts to the `submit-rfq` or `submit-contact` edge function. The payload shapes
   are the ones the deployed `rfq-submission` and `contact-submission` email templates already expect, so
   no backend change is needed.
 */
