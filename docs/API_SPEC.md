@@ -2,7 +2,7 @@
 title: API Spec
 description: Edge functions, payloads, auth, and external integrations
 phase: production
-last_updated: 2026-07-09
+last_updated: 2026-10-02
 owner: Protpure engineering
 ---
 
@@ -44,10 +44,21 @@ All backend endpoints are Supabase Edge Functions (Deno). Invocation from the cl
 ### `send-transactional-email`
 
 - **Method**: `POST` (JWT required — anon session key from the browser is sufficient)
-- **Body**: `{ template: string, to: string, data: Record<string, unknown>, idempotency_key?: string }`
-- **Response** (200): `{ queued: true, message_id: number }`
-- **Flow**: Validates suppression list → renders React Email template → `enqueue_email('transactional_emails', ...)` → trigger `email_queue_wake` arms cron.
+- **Body**: `{ templateName: string, templateData?: object, idempotencyKey?: string, replyTo?: string, recipientEmail?: string }`
+  (snake_case aliases are accepted). `recipientEmail` is ignored when the template defines a fixed recipient,
+  which both current templates do (`sales@protpure.com`).
+- **Response** (200): `{ success: true, queued: true }`, or `{ success: false, reason: "email_suppressed" }` when the recipient is on the suppression list.
+- **Errors**: 403 for an origin outside the allowlist (`protpure.com`, `www.protpure.com`, `*.lovable.app`, `*.lovable.dev`), 429 above 5 requests per minute per IP, 400 for a missing template or an invalid `replyTo`, 404 for an unknown template, 500 on backend failures.
+- **Flow**: origin + rate-limit check → suppression check → unsubscribe token → renders the React Email template → `enqueue_email('transactional_emails', ...)` → trigger `email_queue_wake` arms cron.
 - **Templates**: `contact-submission`, `rfq-submission` (see `_shared/transactional-email-templates/registry.ts`).
+- **Client**: called only from `submitEnquiry` in `src/lib/enquiry.ts`.
+
+Template data sent by the site:
+
+| Template | `templateData` |
+| --- | --- |
+| `rfq-submission` | `{ name, company, email, phone, country, requirements, items: [{ productName, packSize, catNo, quantity, notes }] }` — services and document requests are items too, with `productName` prefixed "Service: " or "Document request: " |
+| `contact-submission` | `{ name, company, email, message }` — phone and country are appended to `message` |
 
 ### `process-email-queue`
 
@@ -76,16 +87,16 @@ All backend endpoints are Supabase Edge Functions (Deno). Invocation from the cl
 ### `linkedin-company-feed`
 
 - **Method**: `POST` (open)
-- **Body**: `{ limit?: number }`
-- **Response**: `{ posts: Post[], source: "linkedin" | "fallback", cached_at: string }`
-- **Flow**: Attempts LinkedIn API via the `LINKEDIN_API_KEY` connector; falls back to a curated static list if the `r_organization_social` scope is unavailable. 30-minute in-memory cache.
+- **Response**: `{ source: "live" | "fallback", posts: Post[] }` with `Post = { id, url, text, publishedAt, thumbnailUrl? }`
+- **Flow**: Attempts the LinkedIn API through the Lovable connector gateway (`LOVABLE_API_KEY`, `LINKEDIN_API_KEY`). If that fails it returns `source: "fallback"` with an **empty** list. 30-minute in-memory cache.
+- **Client**: `LinkedInFeed` renders posts only when `source === "live"`; otherwise the Contact page shows the profile link alone.
 
 ## External integrations
 
 | Integration | Consumer | Notes |
 | --- | --- | --- |
 | Resend | `process-email-queue`, `handle-email-suppression` | Deliverable transport + webhook events |
-| LinkedIn API | `linkedin-company-feed` | Via Lovable connector; graceful fallback |
+| LinkedIn API | `linkedin-company-feed` | Via Lovable connector; no posts are shown when it is unavailable |
 | Lovable AI Gateway | reserved (`LOVABLE_API_KEY` present) | Not currently invoked in production |
 
 ## Authenticated request flow (RFQ submission)
@@ -93,7 +104,7 @@ All backend endpoints are Supabase Edge Functions (Deno). Invocation from the cl
 ```mermaid
 sequenceDiagram
     participant U as User (browser)
-    participant R as RFQContext
+    participant R as EnquiryForm / lib/enquiry.ts
     participant SJS as supabase-js
     participant EF as send-transactional-email
     participant DB as Postgres (pgmq + tables)
@@ -101,15 +112,15 @@ sequenceDiagram
     participant W as process-email-queue
     participant RS as Resend
 
-    U->>R: Fill RFQ drawer, submit
-    R->>SJS: functions.invoke("send-transactional-email", body)
+    U->>R: Fill the enquiry form, submit
+    R->>SJS: submitEnquiry → functions.invoke("send-transactional-email", body)
     SJS->>EF: POST /functions/v1/send-transactional-email<br/>Authorization: Bearer <anon JWT>
     EF->>DB: check suppressed_emails
     EF->>DB: enqueue_email('transactional_emails', payload)
     DB-->>EF: msg_id
     DB->>DB: trigger email_queue_wake → schedule cron
-    EF-->>SJS: 200 { queued: true, message_id }
-    SJS-->>R: success → toast + clear drawer
+    EF-->>SJS: 200 { success: true, queued: true }
+    SJS-->>R: ok → confirmation panel, list cleared (otherwise: error panel with email / WhatsApp fallback)
 
     Cron->>DB: email_queue_dispatch()
     DB->>W: POST /functions/v1/process-email-queue (service role)

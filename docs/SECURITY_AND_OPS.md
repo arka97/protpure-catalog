@@ -2,7 +2,7 @@
 title: Security and Ops
 description: Auth, RLS, secrets, queue ops, deploy, and exports
 phase: production
-last_updated: 2026-07-09
+last_updated: 2026-10-02
 owner: Protpure engineering
 ---
 
@@ -13,7 +13,7 @@ owner: Protpure engineering
 The public site has **no end-user accounts**. There are two auth surfaces:
 
 1. **Docs Hub password gate** — `verify-doc-password` compares a submitted password against the `DOCS_PASSWORD` secret and returns a short-lived signed JWT. The token + `expires_at` are stored in `sessionStorage` under `protpure_docs_token(_exp)` and cleared on tab close or expiry. All doc reads go through `docs-content` which re-verifies the token server-side.
-2. **Anonymous Data API** — `products` is publicly readable (`SELECT` policy `USING (true)`). No writes are exposed to the client.
+2. **Anonymous Data API** — `products` is publicly readable (`SELECT` policy `USING (true)`), but the site no longer reads it. No writes are exposed to the client.
 
 There is no Supabase Auth user, no OAuth provider, no email/password flow — adding one is intentionally deferred until a real user account use case exists.
 
@@ -27,7 +27,7 @@ There is no Supabase Auth user, no OAuth provider, no email/password flow — ad
 | `handle-email-unsubscribe` | false | Idempotent token redemption |
 | `handle-email-suppression` | false | Verifies Resend webhook signature inside |
 | `linkedin-company-feed` | false | Read-only outbound fetch, cached |
-| `send-transactional-email` | true | Requires the anon JWT so casual scraping can't spam it |
+| `send-transactional-email` | true | Requires the anon JWT, an allowed `Origin` (protpure.com, www.protpure.com, `*.lovable.app`, `*.lovable.dev`) and stays under 5 requests per minute per IP |
 | `process-email-queue` | true | Called by cron with the service-role Bearer from vault |
 
 ## RLS enforcement
@@ -65,6 +65,21 @@ All secrets are stored in Lovable Cloud's secret store and injected into edge fu
 - Published URL: `protpure.lovable.app`.
 - Custom domains: `protpure.com`, `www.protpure.com`.
 - Deploys are triggered from the Lovable IDE — no separate CI pipeline.
+
+### Moving to another host
+
+The app is a static bundle and can be served from any web server with a single-page-app fallback
+(unknown paths serve `index.html`). Two things must follow the move:
+
+- add the new origin to `ALLOWED_ORIGINS` in `supabase/functions/send-transactional-email/index.ts`, otherwise every enquiry is refused with 403 (the form then shows its email / WhatsApp fallback);
+- keep `VITE_SUPABASE_*` set at build time.
+
+## Client-side data
+
+- The quote list is stored in `localStorage` (`protpure_quote_list_v2`): catalogue numbers, quantities, notes. It is validated when read.
+- Contact details typed into an enquiry form are kept in memory only and are never written to storage.
+- The comparison selection is stored in `sessionStorage` (`protpure_compare_v2`).
+- The enquiry form has a honeypot field; a filled honeypot is accepted silently and nothing is sent.
 
 ## Data export
 
