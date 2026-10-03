@@ -49,7 +49,6 @@ const haystack = (p: Product) =>
     .join(" ")
     .toLowerCase();
 
-const HAYSTACKS = new Map(PRODUCTS.map((p) => [p.slug, haystack(p)]));
 
 const chip = (on: boolean) =>
   cn(
@@ -98,7 +97,7 @@ export default function Products() {
         (!family || p.family === family) &&
         (!grade || p.variants.some((v) => v.grade === grade)) &&
         (!stage || p.stages.includes(stage)) &&
-        tokens.every((t) => HAYSTACKS.get(p.slug)!.includes(t)),
+        tokens.every((t) => haystack(p).includes(t)),
     );
   }, [family, grade, stage, query]);
 
