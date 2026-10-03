@@ -8,6 +8,13 @@
       "when": 1790920569573,
       "tag": "0000_pin_email_function_search_path",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790992831535,
+      "tag": "0001_catalog_products",
+      "breakpoints": true
     }
   ]
 }
