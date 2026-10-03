@@ -787,7 +787,7 @@ const emptyColumns: Product = {
 
 /* ------------------------------------------------------------------ Catalogue */
 
-export const PRODUCTS: Product[] = [
+const STATIC_PRODUCTS: Product[] = [
   niNta,
   coNta,
   cuNta,
@@ -809,20 +809,37 @@ export const PRODUCTS: Product[] = [
   emptyColumns,
 ];
 
+/*
+  The catalogue is stored in the database (catalog_products). The list above is the built-in fallback
+  shown on first paint and whenever the database is unreachable; hydrateCatalog() swaps in the
+  database copy. Exports are `let` so ES live bindings give every importer the current values.
+*/
+export let PRODUCTS: Product[] = STATIC_PRODUCTS;
+export let VARIANTS = derive(PRODUCTS).variants;
+/** Catalogue numbers of resins, pre-packed columns and kits. */
+export let SKU_COUNT = derive(PRODUCTS).sku;
+/** Everything with a catalogue number, including the empty columns. */
+export let CATALOGUE_COUNT = SKU_COUNT + EMPTY_COLUMNS.length;
+
+function derive(list: Product[]) {
+  const variants = list.flatMap((product) => product.variants.map((variant) => ({ product, variant })));
+  return { variants, sku: variants.reduce((n, v) => n + v.variant.packs.length, 0) };
+}
+
+export function hydrateCatalog(list: Product[]) {
+  if (!list.length) return false;
+  if (JSON.stringify(list) === JSON.stringify(PRODUCTS)) return false;
+  PRODUCTS = list;
+  const d = derive(list);
+  VARIANTS = d.variants;
+  SKU_COUNT = d.sku;
+  CATALOGUE_COUNT = SKU_COUNT + EMPTY_COLUMNS.length;
+  return true;
+}
+
 export const productBySlug = (slug: string) => PRODUCTS.find((p) => p.slug === slug);
-
 export const productsByFamily = (family: Product["family"]) => PRODUCTS.filter((p) => p.family === family);
-
-/** Every variant with its parent product, for search, compare and the catalogue-number table. */
-export const VARIANTS = PRODUCTS.flatMap((product) => product.variants.map((variant) => ({ product, variant })));
-
 export const variantById = (id: string) => VARIANTS.find((v) => v.variant.id === id);
-
-/** Catalogue numbers of resins, pre-packed columns and kits (the client's product list). */
-export const SKU_COUNT = VARIANTS.reduce((n, v) => n + v.variant.packs.length, 0);
-
-/** Everything with a catalogue number: the items above and the empty columns. The figure the site states. */
-export const CATALOGUE_COUNT = SKU_COUNT + EMPTY_COLUMNS.length;
 
 /** Products the client asked to feature on the home page ("Feature Product_services" sheet). */
 export const FEATURED_SLUGS = [

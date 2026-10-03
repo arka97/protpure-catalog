@@ -20,6 +20,3 @@ verify_jwt = false
 
 [functions.submit-contact]
 verify_jwt = false
-
-[functions.seed-catalog]
-verify_jwt = false
